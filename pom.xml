@@ -8,8 +8,8 @@
     <packaging>jar</packaging>
     <name>Aho-CoraSick algorithm for efficient string matching</name>
     <description>Java library for efficient string matching against a large set of keywords</description>
-    <inceptionYear>2014</inceptionYear>
-    <url>http://ahocorasick.org</url>
+    <inceptionYear>2019</inceptionYear>
+    <url>http://neosearch.de</url>
 
     <distributionManagement>
         <snapshotRepository>
@@ -29,15 +29,14 @@
 
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>MIT</name>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <url>scm:git://github.com/robert-bor/aho-corasick</url>
-        <connection>scm:git://github.com/robert-bor/aho-corasick</connection>
+        <url>scm:git://github.com/neosearch/multiple-strings-matching</url>
+        <connection>scm:git://github.com/neosearch/multiple-strings-matching</connection>
     </scm>
 
     <developers>
