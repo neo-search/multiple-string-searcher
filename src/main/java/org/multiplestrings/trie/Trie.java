@@ -1,71 +1,199 @@
 package org.multiplestrings.trie;
 
+import static java.lang.Character.isWhitespace;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 
-import org.multiplestrings.trie.PayloadTrie.PayloadTrieBuilder;
-import org.multiplestrings.trie.handler.EmitHandler;
-import org.multiplestrings.trie.handler.PayloadEmitDelegateHandler;
+import org.multiplestrings.EmitHandler;
+import org.multiplestrings.FragmentToken;
+import org.multiplestrings.MatchToken;
+import org.multiplestrings.Token;
+import org.multiplestrings.trie.handler.DefaultEmitHandler;
 import org.multiplestrings.trie.handler.StatefulEmitHandler;
-import org.multiplestrings.trie.handler.StatefulPayloadEmitDelegateHandler;
+import org.multiplestrings.trie.interval.IntervalTree;
+import org.multiplestrings.trie.interval.Intervalable;
+import org.multiplestrings.trie.util.ListElementRemoval;
+import org.multiplestrings.trie.util.ListElementRemoval.RemoveElementPredicate;
 
 /**
- * Based on the Aho-Corasick white paper, Bell technologies:
- * http://cr.yp.to/bib/1975/aho.pdf
+ * A trie implementation, based on the Aho-Corasick white paper, Bell
+ * technologies: http://cr.yp.to/bib/1975/aho.pdf
+ * <p>
  *
- * @author Robert Bor
+ * The payload trie adds the possibility to specify emitted payloads for each
+ * added keyword.
+ * 
+ * @author Daniel Beck
+ * @param <T> The type of the supplied of the payload
  */
-public class Trie {
+public class Trie<T> {
 
-    private final PayloadTrie<String> payloadTrie;
+    private final TrieConfig trieConfig;
 
-    private Trie(final PayloadTrie<String> payloadTrie) {
-        this.payloadTrie = payloadTrie;
+    private final State<T> rootState;
+
+    protected Trie(final TrieConfig trieConfig) {
+        this.trieConfig = trieConfig;
+        this.rootState = new State<>();
     }
 
-    public Collection<Token> tokenize(final String text) {
-        Collection<PayloadToken<String>> tokens = this.payloadTrie.tokenize(text);
-        return asTokens(tokens);
-    }
-
-    private static Collection<Token> asTokens(Collection<PayloadToken<String>> tokens) {
-        Collection<Token> result = new ArrayList<>();
-        for (PayloadToken<String> payloadToken : tokens) {
-            result.add(new DefaultToken(payloadToken));
+    /**
+     * Used by the builder to add a text search keyword with a emit payload.
+     *
+     * @param keyword The search term to add to the list of search terms.
+     * @param emit    the payload to emit for this search term.
+     * @throws NullPointerException if the keyword is null.
+     */
+    private void addKeyword(String keyword, T emit) {
+        if (keyword.isEmpty()) {
+            return;
         }
-        return result;
-    }
 
-    private static Collection<Emit> asEmits(Collection<PayloadEmit<String>> emits) {
-        Collection<Emit> result = new ArrayList<>();
-        for (PayloadEmit<String> emit : emits) {
-            result.add(asEmit(emit));
+        if (isCaseInsensitive()) {
+            keyword = keyword.toLowerCase();
         }
-        return result;
+
+        addState(keyword).addEmit(new Payload<T>(keyword, emit));
     }
 
-    private static Emit asEmit(PayloadEmit<String> payloadEmit) {
-        return new Emit(payloadEmit.getStart(), payloadEmit.getEnd(), payloadEmit.getKeyword());
+    /**
+     * Used by the builder to add a text search keyword.
+     *
+     * @param keyword The search term to add to the list of search terms.
+     * @throws NullPointerException if the keyword is null.
+     */
+    private void addKeyword(String keyword) {
+        if (keyword.isEmpty()) {
+            return;
+        }
+
+        if (isCaseInsensitive()) {
+            keyword = keyword.toLowerCase();
+        }
+
+        addState(keyword).addEmit(new Payload<T>(keyword, null));
     }
 
-    public Collection<Emit> parseText(final CharSequence text) {
-        Collection<PayloadEmit<String>> parsedText = this.payloadTrie.parseText(text);
-        return asEmits(parsedText);
+    private State<T> addState(final String keyword) {
+        return getRootState().addState(keyword);
     }
 
+    /**
+     * Tokenizes the specified text and returns the emitted outputs.
+     * 
+     * @param text The text to tokenize.
+     */
+    public Collection<Token<T>> tokenize(final String text) {
+        final Collection<Token<T>> tokens = new ArrayList<>();
+        final Collection<Emit<T>> collectedEmits = parseText(text);
+        int lastCollectedPosition = -1;
+
+        for (final Emit<T> emit : collectedEmits) {
+            if (emit.getStart() - lastCollectedPosition > 1) {
+                tokens.add((Token<T>) createFragment(emit, text, lastCollectedPosition));
+            }
+
+            tokens.add(createMatch(emit, text));
+            lastCollectedPosition = emit.getEnd();
+        }
+
+        if (text.length() - lastCollectedPosition > 1) {
+            tokens.add((Token<T>) createFragment(null, text, lastCollectedPosition));
+        }
+
+        return tokens;
+    }
+
+    private Token<T> createFragment(final Emit<T> emit, final String text, final int lastCollectedPosition) {
+        return new FragmentToken<T>(
+                text.substring(lastCollectedPosition + 1, emit == null ? text.length() : emit.getStart()));
+    }
+
+    private Token<T> createMatch(Emit<T> emit, String text) {
+        return new MatchToken<T>(text.substring(emit.getStart(), emit.getEnd() + 1), emit);
+    }
+
+    /**
+     * Tokenizes a specified text and returns the emitted outputs.
+     * 
+     * @param text The character sequence to tokenize.
+     * @return A collection of emits.
+     */
+    public Collection<Emit<T>> parseText(final CharSequence text) {
+        return parseText(text, new DefaultEmitHandler<T>());
+    }
+
+    /**
+     * Tokenizes the specified text by using a custom EmitHandler and returns the
+     * emitted outputs.
+     * 
+     * @param text        The character sequence to tokenize.
+     * @param emitHandler The emit handler that will be used to parse the text.
+     * @return A collection of emits.
+     */
     @SuppressWarnings("unchecked")
-    public Collection<Emit> parseText(final CharSequence text, final StatefulEmitHandler emitHandler) {
-        Collection<PayloadEmit<String>> parsedText = this.payloadTrie.parseText(text,
-                new StatefulPayloadEmitDelegateHandler(emitHandler));
-        return asEmits(parsedText);
+    public Collection<Emit<T>> parseText(final CharSequence text, final StatefulEmitHandler<T> emitHandler) {
+        parseText(text, (EmitHandler<T>) emitHandler);
+
+        final List<Emit<T>> collectedEmits = emitHandler.getEmits();
+
+        if (trieConfig.isOnlyWholeWords()) {
+            removePartialMatches(text, collectedEmits);
+        }
+
+        if (trieConfig.isOnlyWholeWordsWhiteSpaceSeparated()) {
+            removePartialMatchesWhiteSpaceSeparated(text, collectedEmits);
+        }
+
+        if (!trieConfig.isAllowOverlaps()) {
+            IntervalTree intervalTree = new IntervalTree((List<Intervalable>) (List<?>) collectedEmits);
+            intervalTree.removeOverlaps((List<Intervalable>) (List<?>) collectedEmits);
+        }
+
+        return collectedEmits;
     }
 
+    /**
+     * Returns true if the text contains contains one of the search terms. Else,
+     * returns false.
+     * 
+     * @param Text Specified text.
+     * @return true if the text contains one of the search terms. Else, returns
+     *         false.
+     */
     public boolean containsMatch(final CharSequence text) {
         return firstMatch(text) != null;
     }
 
-    public void parseText(final CharSequence text, final EmitHandler emitHandler) {
-        this.payloadTrie.parseText(text, new PayloadEmitDelegateHandler(emitHandler));
+    /**
+     * Tokenizes the specified text by using a custom EmitHandler and returns the
+     * emitted outputs.
+     * 
+     * @param text        The character sequence to tokenize.
+     * @param emitHandler The emit handler that will be used to parse the text.
+     * @return A collection of emits.
+     */
+
+    public void parseText(final CharSequence text, final EmitHandler<T> emitHandler) {
+        State<T> currentState = getRootState();
+
+        for (int position = 0; position < text.length(); position++) {
+            Character character = text.charAt(position);
+
+            // TODO: Maybe lowercase the entire string at once?
+            if (trieConfig.isCaseInsensitive()) {
+                character = Character.toLowerCase(character);
+            }
+
+            currentState = getState(currentState, character);
+            if (storeEmits(position, currentState, emitHandler) && trieConfig.isStopOnHit()) {
+                return;
+            }
+        }
     }
 
     /**
@@ -74,28 +202,177 @@ public class Trie {
      * @param text The text to search for keywords.
      * @return null if no matches found.
      */
-    public Emit firstMatch(final CharSequence text) {
-        PayloadEmit<String> firstMatch = this.payloadTrie.firstMatch(text);
-        return new Emit(firstMatch.getStart(), firstMatch.getEnd(), firstMatch.getKeyword());
+    public Emit<T> firstMatch(final CharSequence text) {
+        if (!trieConfig.isAllowOverlaps()) {
+            // Slow path. Needs to find all the matches to detect overlaps.
+            final Collection<Emit<T>> parseText = parseText(text);
+
+            if (parseText != null && !parseText.isEmpty()) {
+                return parseText.iterator().next();
+            }
+        } else {
+            // Fast path. Returns first match found.
+            State<T> currentState = getRootState();
+
+            for (int position = 0; position < text.length(); position++) {
+                Character character = text.charAt(position);
+
+                // TODO: Lowercase the entire string at once?
+                if (trieConfig.isCaseInsensitive()) {
+                    character = Character.toLowerCase(character);
+                }
+
+                currentState = getState(currentState, character);
+                Collection<Payload<T>> payloads = currentState.emit();
+
+                if (payloads != null && !payloads.isEmpty()) {
+                    for (final Payload<T> payload : payloads) {
+                        final Emit<T> emit = new Emit<>(position - payload.getKeyword().length() + 1, position,
+                                payload.getKeyword(), payload.getData());
+                        if (trieConfig.isOnlyWholeWords()) {
+                            if (!isPartialMatch(text, emit)) {
+                                return emit;
+                            }
+                        } else {
+                            return emit;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isPartialMatch(final CharSequence searchText, final Emit<T> emit) {
+        return (emit.getStart() != 0 && Character.isAlphabetic(searchText.charAt(emit.getStart() - 1)))
+                || (emit.getEnd() + 1 != searchText.length() && Character.isAlphabetic(searchText.charAt(emit.getEnd() + 1)));
+    }
+
+    private void removePartialMatches(final CharSequence searchText, final List<Emit<T>> collectedEmits) {
+
+        final RemoveElementPredicate<Emit<T>> predicate = new RemoveElementPredicate<Emit<T>>() {
+
+            @Override
+            public boolean remove(Emit<T> emit) {
+                return isPartialMatch(searchText, emit);
+            }
+
+        };
+
+        ListElementRemoval.removeIf(collectedEmits, predicate);
+    }
+
+    private void removePartialMatchesWhiteSpaceSeparated(final CharSequence searchText,
+            final List<Emit<T>> collectedEmits) {
+        final long size = searchText.length();
+        final List<Emit<T>> removeEmits = new ArrayList<>();
+
+        for (final Emit<T> emit : collectedEmits) {
+            if ((emit.getStart() == 0 || isWhitespace(searchText.charAt(emit.getStart() - 1)))
+                    && (emit.getEnd() + 1 == size || isWhitespace(searchText.charAt(emit.getEnd() + 1)))) {
+                continue;
+            }
+            removeEmits.add(emit);
+        }
+
+        for (final Emit<T> removeEmit : removeEmits) {
+            collectedEmits.remove(removeEmit);
+        }
+    }
+
+    private State<T> getState(State<T> currentState, final Character character) {
+        State<T> newCurrentState = currentState.nextState(character);
+
+        while (newCurrentState == null) {
+            currentState = currentState.failure();
+            newCurrentState = currentState.nextState(character);
+        }
+
+        return newCurrentState;
+    }
+
+    private void constructFailureStates() {
+        final Queue<State<T>> queue = new LinkedBlockingDeque<>();
+        final State<T> startState = getRootState();
+
+        // First, set the fail state of all depth 1 states to the root state
+        for (State<T> depthOneState : startState.getStates()) {
+            depthOneState.setFailure(startState);
+            queue.add(depthOneState);
+        }
+
+        // Second, determine the fail state for all depth > 1 state
+        while (!queue.isEmpty()) {
+            final State<T> currentState = queue.remove();
+
+            for (final Character transition : currentState.getTransitions()) {
+                State<T> targetState = currentState.nextState(transition);
+                queue.add(targetState);
+
+                State<T> traceFailureState = currentState.failure();
+                while (traceFailureState.nextState(transition) == null) {
+                    traceFailureState = traceFailureState.failure();
+                }
+
+                final State<T> newFailureState = traceFailureState.nextState(transition);
+                targetState.setFailure(newFailureState);
+                targetState.addEmit(newFailureState.emit());
+            }
+        }
+    }
+
+    private boolean storeEmits(final int position, final State<T> currentState, final EmitHandler<T> emitHandler) {
+        boolean emitted = false;
+        final Collection<Payload<T>> payloads = currentState.emit();
+
+        // TODO: The check for empty might be superfluous.
+        if (payloads != null && !payloads.isEmpty()) {
+            for (final Payload<T> payload : payloads) {
+                emitted = emitHandler.emit(new Emit<T>(position - payload.getKeyword().length() + 1, position,
+                        payload.getKeyword(), payload.getData())) || emitted;
+
+                if (emitted && trieConfig.isStopOnHit()) {
+                    break;
+                }
+            }
+        }
+
+        return emitted;
+    }
+
+    private boolean isCaseInsensitive() {
+        return trieConfig.isCaseInsensitive();
+    }
+
+    private State<T> getRootState() {
+        return this.rootState;
     }
 
     /**
-     * Provides a fluent interface for constructing Trie instances.
+     * Provides a fluent interface for constructing Trie instances with payloads.
      *
      * @return The builder used to configure its Trie.
      */
-    public static TrieBuilder builder() {
-        return new TrieBuilder();
+    public static <T> PayloadTrieBuilder<T> builder() {
+        return new PayloadTrieBuilder<T>();
     }
 
-    public static class TrieBuilder {
+    /**
+     * Builder class to create a PayloadTrie instance.
+     * 
+     * @param <T> The type of the emitted payload.
+     */
+    public static class PayloadTrieBuilder<T> {
 
-        private final PayloadTrieBuilder<String> delegate = PayloadTrie.builder();
+        private final TrieConfig trieConfig = new TrieConfig();
+
+        private final Trie<T> trie = new Trie<>(trieConfig);
 
         /**
          * Default (empty) constructor.
          */
-        private TrieBuilder() {
+        private PayloadTrieBuilder() {
         }
 
         /**
@@ -106,8 +383,8 @@ public class Trie {
          *
          * @return This builder.
          */
-        public TrieBuilder ignoreCase() {
-            delegate.ignoreCase();
+        public PayloadTrieBuilder<T> ignoreCase() {
+            this.trieConfig.setCaseInsensitive(true);
             return this;
         }
 
@@ -116,45 +393,46 @@ public class Trie {
          *
          * @return This builder.
          */
-        public TrieBuilder ignoreOverlaps() {
-            delegate.ignoreOverlaps();
+        public PayloadTrieBuilder<T> ignoreOverlaps() {
+            this.trieConfig.setAllowOverlaps(false);
             return this;
         }
 
         /**
-         * Adds a keyword to the Trie's list of text search keywords.
+         * Adds a keyword to the Trie's list of text search keywords. No Payload is
+         * supplied.
          *
          * @param keyword The keyword to add to the list.
          * @return This builder.
          * @throws NullPointerException if the keyword is null.
          */
-        public TrieBuilder addKeyword(final String keyword) {
-            delegate.addKeyword(keyword, null);
+        public PayloadTrieBuilder<T> addKeyword(final String keyword) {
+            this.trie.addKeyword(keyword);
             return this;
         }
 
         /**
-         * Adds a list of keywords to the Trie's list of text search keywords.
+         * Adds a keyword and a payload to the Trie's list of text search keywords.
          *
-         * @param keywords The keywords to add to the list.
+         * @param keyword The keyword to add to the list.
          * @return This builder.
+         * @throws NullPointerException if the keyword is null.
          */
-        public TrieBuilder addKeywords(final String... keywords) {
-            for (String keyword : keywords) {
-                delegate.addKeyword(keyword, null);
-            }
+        public PayloadTrieBuilder<T> addKeyword(final String keyword, final T payload) {
+            this.trie.addKeyword(keyword, payload);
             return this;
         }
 
         /**
-         * Adds a list of keywords to the Trie's list of text search keywords.
+         * Adds a list of keywords and payloads to the Trie's list of text search
+         * keywords.
          *
          * @param keywords The keywords to add to the list.
          * @return This builder.
          */
-        public TrieBuilder addKeywords(final Collection<String> keywords) {
-            for (String keyword : keywords) {
-                this.delegate.addKeyword(keyword, null);
+        public PayloadTrieBuilder<T> addKeywords(final Collection<Payload<T>> keywords) {
+            for (Payload<T> payload : keywords) {
+                this.trie.addKeyword(payload.getKeyword(), payload.getData());
             }
             return this;
         }
@@ -164,8 +442,8 @@ public class Trie {
          *
          * @return This builder.
          */
-        public TrieBuilder onlyWholeWords() {
-            this.delegate.onlyWholeWords();
+        public PayloadTrieBuilder<T> onlyWholeWords() {
+            this.trieConfig.setOnlyWholeWords(true);
             return this;
         }
 
@@ -176,8 +454,8 @@ public class Trie {
          *
          * @return This builder.
          */
-        public TrieBuilder onlyWholeWordsWhiteSpaceSeparated() {
-            this.delegate.onlyWholeWordsWhiteSpaceSeparated();
+        public PayloadTrieBuilder<T> onlyWholeWordsWhiteSpaceSeparated() {
+            this.trieConfig.setOnlyWholeWordsWhiteSpaceSeparated(true);
             return this;
         }
 
@@ -186,26 +464,26 @@ public class Trie {
          *
          * @return This builder.
          */
-        public TrieBuilder stopOnHit() {
-            this.delegate.stopOnHit();
+        public PayloadTrieBuilder<T> stopOnHit() {
+            trie.trieConfig.setStopOnHit(true);
             return this;
         }
 
         /**
-         * Configure the Trie based on the builder settings.
+         * Configure the PayloadTrie based on the builder settings.
          *
-         * @return The configured Trie.
+         * @return The configured PayloadTrie.
          */
-        public Trie build() {
-            PayloadTrie<String> payloadTrie = this.delegate.build();
-            return new Trie(payloadTrie);
+        public Trie<T> build() {
+            this.trie.constructFailureStates();
+            return this.trie;
         }
 
         /**
          * @return This builder.
          * @deprecated Use ignoreCase()
          */
-        public TrieBuilder caseInsensitive() {
+        public PayloadTrieBuilder<T> caseInsensitive() {
             return ignoreCase();
         }
 
@@ -213,7 +491,7 @@ public class Trie {
          * @return This builder.
          * @deprecated Use ignoreOverlaps()
          */
-        public TrieBuilder removeOverlaps() {
+        public PayloadTrieBuilder<T> removeOverlaps() {
             return ignoreOverlaps();
         }
     }

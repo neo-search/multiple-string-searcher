@@ -12,12 +12,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Test;
 import org.multiplestrings.trie.Payload;
-import org.multiplestrings.trie.PayloadEmit;
-import org.multiplestrings.trie.PayloadToken;
-import org.multiplestrings.trie.PayloadTrie;
-import org.multiplestrings.trie.handler.AbstractStatefulPayloadEmitHandler;
-import org.multiplestrings.trie.handler.PayloadEmitHandler;
-import org.multiplestrings.trie.handler.StatefulPayloadEmitHandler;
+import org.multiplestrings.EmitHandler;
+import org.multiplestrings.Token;
+import org.multiplestrings.trie.Emit;
+import org.multiplestrings.trie.Trie;
+import org.multiplestrings.trie.handler.AbstractStatefulEmitHandler;
+import org.multiplestrings.trie.handler.StatefulEmitHandler;
 
 public class PayloadTrieTest {
 
@@ -102,68 +102,68 @@ public class PayloadTrieTest {
 
     @Test
     public void keywordAndTextAreTheSame() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
-        Collection<PayloadEmit<String>> emits = trie.parseText(ALPHABET[0]);
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Trie<String> trie = Trie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
+        Collection<Emit<String>> emits = trie.parseText(ALPHABET[0]);
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 0, 2, ALPHABET[0], ALPHABET_PAYLOAD[0]);
     }
 
     @Test
     public void keywordAndTextAreTheSameFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
-        PayloadEmit<String> firstMatch = trie.firstMatch(ALPHABET[0]);
+        Trie<String> trie = Trie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
+        Emit<String> firstMatch = trie.firstMatch(ALPHABET[0]);
         checkEmit(firstMatch, 0, 2, ALPHABET[0], ALPHABET_PAYLOAD[0]);
     }
 
     @Test
     public void textIsLongerThanKeyword() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
-        Collection<PayloadEmit<String>> emits = trie.parseText(" " + ALPHABET[0]);
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Trie<String> trie = Trie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
+        Collection<Emit<String>> emits = trie.parseText(" " + ALPHABET[0]);
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 1, 3, ALPHABET[0], ALPHABET_PAYLOAD[0]);
     }
 
     @Test
     public void textIsLongerThanKeywordFirstMatch() {
 
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
-        PayloadEmit<String> firstMatch = trie.firstMatch(" " + ALPHABET[0]);
+        Trie<String> trie = Trie.<String>builder().addKeyword(ALPHABET[0], ALPHABET_PAYLOAD[0]).build();
+        Emit<String> firstMatch = trie.firstMatch(" " + ALPHABET[0]);
         checkEmit(firstMatch, 1, 3, ALPHABET[0], ALPHABET_PAYLOAD[0]);
     }
 
     @Test
     public void variousKeywordsOneMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeywords(ALPHABET_WITH_PAYLOADS).build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("bcd");
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Trie<String> trie = Trie.<String>builder().addKeywords(ALPHABET_WITH_PAYLOADS).build();
+        Collection<Emit<String>> emits = trie.parseText("bcd");
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 0, 2, "bcd", "alpha:bcd");
     }
 
     @Test
     public void variousKeywordsFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeywords(ALPHABET_WITH_PAYLOADS).build();
-        PayloadEmit<String> firstMatch = trie.firstMatch("bcd");
+        Trie<String> trie = Trie.<String>builder().addKeywords(ALPHABET_WITH_PAYLOADS).build();
+        Emit<String> firstMatch = trie.firstMatch("bcd");
         checkEmit(firstMatch, 0, 2, "bcd", "alpha:bcd");
     }
 
     @Test
     public void ushersTestAndStopOnHit() {
-        PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).stopOnHit().build();
-        Collection<PayloadEmit<Integer>> emits = trie.parseText("ushers");
+        Trie<Integer> trie = Trie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).stopOnHit().build();
+        Collection<Emit<Integer>> emits = trie.parseText("ushers");
         assertEquals(1, emits.size()); // she @ 3, he @ 3, hers @ 5
-        Iterator<PayloadEmit<Integer>> iterator = emits.iterator();
+        Iterator<Emit<Integer>> iterator = emits.iterator();
         checkEmit(iterator.next(), 2, 3, "he", 20);
     }
 
     @Test
     public void ushersTestStopOnHitSkipOne() {
-        PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).stopOnHit().build();
+        Trie<Integer> trie = Trie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).stopOnHit().build();
 
-        StatefulPayloadEmitHandler<Integer> testEmitHandler = new AbstractStatefulPayloadEmitHandler<Integer>() {
+        StatefulEmitHandler<Integer> testEmitHandler = new AbstractStatefulEmitHandler<Integer>() {
             boolean first = true;
 
             @Override
-            public boolean emit(final PayloadEmit<Integer> emit) {
+            public boolean emit(final Emit<Integer> emit) {
                 if (first) {
                     // return false for the first element
                     first = false;
@@ -176,18 +176,18 @@ public class PayloadTrieTest {
         };
 
         trie.parseText("ushers", testEmitHandler);
-        Collection<PayloadEmit<Integer>> emits = testEmitHandler.getEmits();
+        Collection<Emit<Integer>> emits = testEmitHandler.getEmits();
         assertEquals(1, emits.size()); // she @ 3, he @ 3, hers @ 5
-        Iterator<PayloadEmit<Integer>> iterator = emits.iterator();
+        Iterator<Emit<Integer>> iterator = emits.iterator();
         checkEmit(iterator.next(), 1, 3, "she", 4);
     }
 
     @Test
     public void ushersTest() {
-        PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
-        Collection<PayloadEmit<Integer>> emits = trie.parseText("ushers");
+        Trie<Integer> trie = Trie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
+        Collection<Emit<Integer>> emits = trie.parseText("ushers");
         assertEquals(3, emits.size()); // she @ 3, he @ 3, hers @ 5
-        Iterator<PayloadEmit<Integer>> iterator = emits.iterator();
+        Iterator<Emit<Integer>> iterator = emits.iterator();
 
         checkEmit(iterator.next(), 2, 3, "he", 20);
         checkEmit(iterator.next(), 1, 3, "she", 4);
@@ -196,11 +196,11 @@ public class PayloadTrieTest {
 
     @Test
     public void ushersTestWithCapitalKeywords() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().addKeyword("HERS", "hers").addKeyword("HIS", "his")
+        Trie<String> trie = Trie.<String>builder().ignoreCase().addKeyword("HERS", "hers").addKeyword("HIS", "his")
                 .addKeyword("SHE", "she").addKeyword("HE", "he").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("ushers");
+        Collection<Emit<String>> emits = trie.parseText("ushers");
         assertEquals(3, emits.size()); // she @ 3, he @ 3, hers @ 5
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 2, 3, "he", "he");
         checkEmit(iterator.next(), 1, 3, "she", "she");
         checkEmit(iterator.next(), 2, 5, "hers", "hers");
@@ -208,27 +208,27 @@ public class PayloadTrieTest {
 
     @Test
     public void ushersTestFirstMatch() {
-        PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
-        PayloadEmit<Integer> firstMatch = trie.firstMatch("ushers");
+        Trie<Integer> trie = Trie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
+        Emit<Integer> firstMatch = trie.firstMatch("ushers");
         checkEmit(firstMatch, 2, 3, "he", 20);
     }
 
     @Test
     public void ushersTestByCallback() {
-        PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
+        Trie<Integer> trie = Trie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
 
-        final List<PayloadEmit<Integer>> emits = new ArrayList<>();
-        PayloadEmitHandler<Integer> emitHandler = new PayloadEmitHandler<Integer>() {
+        final List<Emit<Integer>> emits = new ArrayList<>();
+        EmitHandler<Integer> emitHandler = new EmitHandler<Integer>() {
 
             @Override
-            public boolean emit(PayloadEmit<Integer> emit) {
+            public boolean emit(Emit<Integer> emit) {
                 emits.add(emit);
                 return true;
             }
         };
         trie.parseText("ushers", emitHandler);
         assertEquals(3, emits.size()); // she @ 3, he @ 3, hers @ 5
-        Iterator<PayloadEmit<Integer>> iterator = emits.iterator();
+        Iterator<Emit<Integer>> iterator = emits.iterator();
 
         checkEmit(iterator.next(), 2, 3, "he", 20);
         checkEmit(iterator.next(), 1, 3, "she", 4);
@@ -237,24 +237,24 @@ public class PayloadTrieTest {
 
     @Test
     public void misleadingTest() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("hers", "pronon:hers").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("h he her hers");
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Trie<String> trie = Trie.<String>builder().addKeyword("hers", "pronon:hers").build();
+        Collection<Emit<String>> emits = trie.parseText("h he her hers");
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 9, 12, "hers", "pronon:hers");
     }
 
     @Test
     public void misleadingTestFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("hers", "pronon:hers").build();
-        PayloadEmit<String> firstMatch = trie.firstMatch("h he her hers");
+        Trie<String> trie = Trie.<String>builder().addKeyword("hers", "pronon:hers").build();
+        Emit<String> firstMatch = trie.firstMatch("h he her hers");
         checkEmit(firstMatch, 9, 12, "hers", "pronon:hers");
     }
 
     @Test
     public void recipes() {
-        PayloadTrie<Food> trie = PayloadTrie.<Food>builder().addKeywords(FOOD_WITH_PAYLOADS).build();
-        Collection<PayloadEmit<Food>> emits = trie.parseText("2 cauliflowers, 3 tomatoes, 4 slices of veal, 100g broccoli");
-        Iterator<PayloadEmit<Food>> iterator = emits.iterator();
+        Trie<Food> trie = Trie.<Food>builder().addKeywords(FOOD_WITH_PAYLOADS).build();
+        Collection<Emit<Food>> emits = trie.parseText("2 cauliflowers, 3 tomatoes, 4 slices of veal, 100g broccoli");
+        Iterator<Emit<Food>> iterator = emits.iterator();
         checkEmit(iterator.next(), 2, 12, "cauliflower", new Food("cauliflower"));
         checkEmit(iterator.next(), 18, 25, "tomatoes", new Food("tomatoes"));
         checkEmit(iterator.next(), 40, 43, "veal", new Food("veal"));
@@ -263,17 +263,17 @@ public class PayloadTrieTest {
 
     @Test
     public void recipesFirstMatch() {
-        PayloadTrie<Food> trie = PayloadTrie.<Food>builder().addKeywords(FOOD_WITH_PAYLOADS).build();
-        PayloadEmit<Food> firstMatch = trie.firstMatch("2 cauliflowers, 3 tomatoes, 4 slices of veal, 100g broccoli");
+        Trie<Food> trie = Trie.<Food>builder().addKeywords(FOOD_WITH_PAYLOADS).build();
+        Emit<Food> firstMatch = trie.firstMatch("2 cauliflowers, 3 tomatoes, 4 slices of veal, 100g broccoli");
         checkEmit(firstMatch, 2, 12, "cauliflower", new Food("cauliflower"));
     }
 
     @Test
     public void longAndShortOverlappingMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("he", "pronon:he").addKeyword("hehehehe", "garbage")
+        Trie<String> trie = Trie.<String>builder().addKeyword("he", "pronon:he").addKeyword("hehehehe", "garbage")
                 .build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("hehehehehe");
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Collection<Emit<String>> emits = trie.parseText("hehehehehe");
+        Iterator<Emit<String>> iterator = emits.iterator();
         checkEmit(iterator.next(), 0, 1, "he", "pronon:he");
         checkEmit(iterator.next(), 2, 3, "he", "pronon:he");
         checkEmit(iterator.next(), 4, 5, "he", "pronon:he");
@@ -285,11 +285,11 @@ public class PayloadTrieTest {
 
     @Test
     public void nonOverlapping() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
+        Trie<String> trie = Trie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
                 .addKeyword("cba", "alpha:cba").addKeyword("ababc", "alpha:ababc").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("ababcbab");
+        Collection<Emit<String>> emits = trie.parseText("ababcbab");
         assertEquals(2, emits.size());
-        Iterator<PayloadEmit<String>> iterator = emits.iterator();
+        Iterator<Emit<String>> iterator = emits.iterator();
         // With overlaps: ab@1, ab@3, ababc@4, cba@6, ab@7
         checkEmit(iterator.next(), 0, 4, "ababc", "alpha:ababc");
         checkEmit(iterator.next(), 6, 7, "ab", "alpha:ab");
@@ -297,51 +297,51 @@ public class PayloadTrieTest {
 
     @Test
     public void nonOverlappingFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
+        Trie<String> trie = Trie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
                 .addKeyword("cba", "alpha:cba").addKeyword("ababc", "alpha:ababc").build();
-        PayloadEmit<String> firstMatch = trie.firstMatch("ababcbab");
+        Emit<String> firstMatch = trie.firstMatch("ababcbab");
 
         checkEmit(firstMatch, 0, 4, "ababc", "alpha:ababc");
     }
 
     @Test
     public void containsMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
+        Trie<String> trie = Trie.<String>builder().removeOverlaps().addKeyword("ab", "alpha:ab")
                 .addKeyword("cba", "alpha:cba").addKeyword("ababc", "alpha:ababc").build();
         assertTrue(trie.containsMatch("ababcbab"));
     }
 
     @Test
     public void startOfChurchillSpeech() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().removeOverlaps().addKeyword("T").addKeyword("u").addKeyword("ur")
+        Trie<String> trie = Trie.<String>builder().removeOverlaps().addKeyword("T").addKeyword("u").addKeyword("ur")
                 .addKeyword("r").addKeyword("urn").addKeyword("ni").addKeyword("i").addKeyword("in").addKeyword("n")
                 .addKeyword("urning").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("Turning");
+        Collection<Emit<String>> emits = trie.parseText("Turning");
         assertEquals(2, emits.size());
     }
 
     @Test
     public void partialMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().onlyWholeWords().addKeyword("sugar", "food:sugar").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("sugarcane sugarcane sugar canesugar"); // left, middle, right test
+        Trie<String> trie = Trie.<String>builder().onlyWholeWords().addKeyword("sugar", "food:sugar").build();
+        Collection<Emit<String>> emits = trie.parseText("sugarcane sugarcane sugar canesugar"); // left, middle, right test
         assertEquals(1, emits.size()); // Match must not be made
         checkEmit(emits.iterator().next(), 20, 24, "sugar", "food:sugar");
     }
 
     @Test
     public void partialMatchFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().onlyWholeWords().addKeyword("sugar", "food:sugar").build();
-        PayloadEmit<String> firstMatch = trie.firstMatch("sugarcane sugarcane sugar canesugar"); // left, middle, right test
+        Trie<String> trie = Trie.<String>builder().onlyWholeWords().addKeyword("sugar", "food:sugar").build();
+        Emit<String> firstMatch = trie.firstMatch("sugarcane sugarcane sugar canesugar"); // left, middle, right test
 
         checkEmit(firstMatch, 20, 24, "sugar", "food:sugar");
     }
 
     @Test
     public void tokenizeFullSentence() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeywords(GREEK_LETTERS_WITH_PAYLOADS).build();
-        Collection<PayloadToken<String>> tokens = trie.tokenize("Hear: Alpha team first, Beta from the rear, Gamma in reserve");
+        Trie<String> trie = Trie.<String>builder().addKeywords(GREEK_LETTERS_WITH_PAYLOADS).build();
+        Collection<Token<String>> tokens = trie.tokenize("Hear: Alpha team first, Beta from the rear, Gamma in reserve");
         assertEquals(7, tokens.size());
-        Iterator<PayloadToken<String>> tokensIt = tokens.iterator();
+        Iterator<Token<String>> tokensIt = tokens.iterator();
         assertEquals("Hear: ", tokensIt.next().getFragment());
         assertEquals("Alpha", tokensIt.next().getFragment());
         assertEquals(" team first, ", tokensIt.next().getFragment());
@@ -354,11 +354,11 @@ public class PayloadTrieTest {
     // @see https://github.com/robert-bor/aho-corasick/issues/5
     @Test
     public void testStringIndexOutOfBoundsException() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().onlyWholeWords().addKeywords(UNICODE_WITH_PAYLOADS)
+        Trie<String> trie = Trie.<String>builder().ignoreCase().onlyWholeWords().addKeywords(UNICODE_WITH_PAYLOADS)
                 .build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("TurninG OnCe AgAiN BÖRKÜ");
+        Collection<Emit<String>> emits = trie.parseText("TurninG OnCe AgAiN BÖRKÜ");
         assertEquals(4, emits.size()); // Match must not be made
-        Iterator<PayloadEmit<String>> it = emits.iterator();
+        Iterator<Emit<String>> it = emits.iterator();
 
         checkEmit(it.next(), 0, 6, "turning", "uni:turning");
         checkEmit(it.next(), 8, 11, "once", "uni:once");
@@ -368,10 +368,10 @@ public class PayloadTrieTest {
 
     @Test
     public void testIgnoreCase() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().addKeywords(UNICODE_WITH_PAYLOADS).build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("TurninG OnCe AgAiN BÖRKÜ");
+        Trie<String> trie = Trie.<String>builder().ignoreCase().addKeywords(UNICODE_WITH_PAYLOADS).build();
+        Collection<Emit<String>> emits = trie.parseText("TurninG OnCe AgAiN BÖRKÜ");
         assertEquals(4, emits.size()); // Match must not be made
-        Iterator<PayloadEmit<String>> it = emits.iterator();
+        Iterator<Emit<String>> it = emits.iterator();
 
         checkEmit(it.next(), 0, 6, "turning", "uni:turning");
         checkEmit(it.next(), 8, 11, "once", "uni:once");
@@ -381,23 +381,23 @@ public class PayloadTrieTest {
 
     @Test
     public void testIgnoreCaseFirstMatch() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().addKeywords(UNICODE_WITH_PAYLOADS).build();
-        PayloadEmit<String> firstMatch = trie.firstMatch("TurninG OnCe AgAiN BÖRKÜ");
+        Trie<String> trie = Trie.<String>builder().ignoreCase().addKeywords(UNICODE_WITH_PAYLOADS).build();
+        Emit<String> firstMatch = trie.firstMatch("TurninG OnCe AgAiN BÖRKÜ");
 
         checkEmit(firstMatch, 0, 6, "turning", "uni:turning");
     }
 
     @Test
     public void tokenizeTokensInSequence() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeywords(GREEK_LETTERS_WITH_PAYLOADS).build();
-        Collection<PayloadToken<String>> tokens = trie.tokenize("Alpha Beta Gamma");
+        Trie<String> trie = Trie.<String>builder().addKeywords(GREEK_LETTERS_WITH_PAYLOADS).build();
+        Collection<Token<String>> tokens = trie.tokenize("Alpha Beta Gamma");
         assertEquals(5, tokens.size());
     }
 
     // @see https://github.com/robert-bor/aho-corasick/issues/7
     @Test
     public void testZeroLength() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreOverlaps().onlyWholeWords().ignoreCase().addKeyword("")
+        Trie<String> trie = Trie.<String>builder().ignoreOverlaps().onlyWholeWords().ignoreCase().addKeyword("")
                 .build();
         trie.tokenize(
                 "Try a natural lip and subtle bronzer to keep all the focus on those big bright eyes with NARS Eyeshadow Duo in Rated R And the winner is... Boots No7 Advanced Renewal Anti-ageing Glycolic Peel Kit ($25 amazon.com) won most-appealing peel.");
@@ -408,11 +408,11 @@ public class PayloadTrieTest {
     public void testUnicode1() {
         String target = "LİKE THIS"; // The second character ('İ') is Unicode, which was read by AC as a 2-byte char
         assertEquals("THIS", target.substring(5, 9)); // Java does it the right way
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().onlyWholeWords().addKeyword("this", "pronon:this")
+        Trie<String> trie = Trie.<String>builder().ignoreCase().onlyWholeWords().addKeyword("this", "pronon:this")
                 .build();
-        Collection<PayloadEmit<String>> emits = trie.parseText(target);
+        Collection<Emit<String>> emits = trie.parseText(target);
         assertEquals(1, emits.size());
-        Iterator<PayloadEmit<String>> it = emits.iterator();
+        Iterator<Emit<String>> it = emits.iterator();
         checkEmit(it.next(), 5, 8, "this", "pronon:this");
     }
 
@@ -420,18 +420,18 @@ public class PayloadTrieTest {
     @Test
     public void testUnicode2() {
         String target = "LİKE THIS"; // The second character ('İ') is Unicode, which was read by AC as a 2-byte char
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().ignoreCase().onlyWholeWords().addKeyword("this", "pronon:this")
+        Trie<String> trie = Trie.<String>builder().ignoreCase().onlyWholeWords().addKeyword("this", "pronon:this")
                 .build();
         assertEquals("THIS", target.substring(5, 9)); // Java does it the right way
-        PayloadEmit<String> firstMatch = trie.firstMatch(target);
+        Emit<String> firstMatch = trie.firstMatch(target);
         checkEmit(firstMatch, 5, 8, "this", "pronon:this");
     }
 
     @Test
     public void testPartialMatchWhiteSpaces() {
-        PayloadTrie<String> trie = PayloadTrie.<String>builder().onlyWholeWordsWhiteSpaceSeparated()
+        Trie<String> trie = Trie.<String>builder().onlyWholeWordsWhiteSpaceSeparated()
                 .addKeyword("#sugar-123", "sugar").build();
-        Collection<PayloadEmit<String>> emits = trie.parseText("#sugar-123 #sugar-1234"); // left, middle, right test
+        Collection<Emit<String>> emits = trie.parseText("#sugar-123 #sugar-1234"); // left, middle, right test
         assertEquals(1, emits.size()); // Match must not be made
         checkEmit(emits.iterator().next(), 0, 9, "#sugar-123", "sugar");
     }
@@ -446,9 +446,9 @@ public class PayloadTrieTest {
 
         injectKeyword(text, keyword, interval);
 
-        PayloadTrie<Food> trie = PayloadTrie.<Food>builder().onlyWholeWords().addKeyword(keyword, payload).build();
+        Trie<Food> trie = Trie.<Food>builder().onlyWholeWords().addKeyword(keyword, payload).build();
 
-        final Collection<PayloadEmit<Food>> emits = trie.parseText(text);
+        final Collection<Emit<Food>> emits = trie.parseText(text);
 
         assertEquals(textSize / interval, emits.size());
     }
@@ -488,7 +488,7 @@ public class PayloadTrieTest {
         return ThreadLocalRandom.current().nextInt(min, max);
     }
 
-    private void checkEmit(PayloadEmit<Food> next, int expectedStart, int expectedEnd, String expectedKeyword,
+    private void checkEmit(Emit<Food> next, int expectedStart, int expectedEnd, String expectedKeyword,
             Food expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());
@@ -496,7 +496,7 @@ public class PayloadTrieTest {
         assertEquals("Payload of emit shoud be " + expectedPayload, expectedPayload, next.getPayload());
     }
 
-    private void checkEmit(PayloadEmit<Integer> next, int expectedStart, int expectedEnd, String expectedKeyword,
+    private void checkEmit(Emit<Integer> next, int expectedStart, int expectedEnd, String expectedKeyword,
             Integer expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());
@@ -504,7 +504,7 @@ public class PayloadTrieTest {
         assertEquals("Payload of emit shoud be " + expectedPayload, expectedPayload, next.getPayload());
     }
 
-    private void checkEmit(PayloadEmit<String> next, int expectedStart, int expectedEnd, String expectedKeyword,
+    private void checkEmit(Emit<String> next, int expectedStart, int expectedEnd, String expectedKeyword,
             String expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());

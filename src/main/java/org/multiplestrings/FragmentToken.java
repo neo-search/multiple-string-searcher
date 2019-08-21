@@ -1,4 +1,6 @@
-package org.multiplestrings.trie;
+package org.multiplestrings;
+
+import org.multiplestrings.trie.Emit;
 
 /***
  * PayloadFragmentToken holds a text ("the fragment").
@@ -10,14 +12,14 @@ package org.multiplestrings.trie;
  *
  * @param <T> The Type of the emitted payloads.
  */
-public class PayloadFragmentToken<T> extends PayloadToken<T> {
+public class FragmentToken<T> extends Token<T> {
 
     /**
      * Constructs a token with the specified text.
      * 
      * @param fragment Text to use to construct this token.
      */
-    public PayloadFragmentToken(String fragment) {
+    public FragmentToken(String fragment) {
         super(fragment);
     }
 
@@ -30,7 +32,7 @@ public class PayloadFragmentToken<T> extends PayloadToken<T> {
      * Returns null.
      */
     @Override
-    public PayloadEmit<T> getEmit() {
+    public Emit<T> getEmit() {
         return null;
     }
 }

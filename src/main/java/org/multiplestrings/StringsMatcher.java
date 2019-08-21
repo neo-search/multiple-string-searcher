@@ -2,11 +2,8 @@ package org.multiplestrings;
 
 import java.util.Collection;
 
+import org.multiplestrings.trie.Emit;
 import org.multiplestrings.trie.Payload;
-import org.multiplestrings.trie.PayloadTrie;
-import org.multiplestrings.trie.TrieConfig;
-import org.multiplestrings.trie.PayloadTrie.PayloadTrieBuilder;
-import org.multiplestrings.trie.handler.PayloadEmitHandler;
 
 /**
  * Matches multiple strings from a text.
@@ -21,7 +18,38 @@ public class StringsMatcher<T> {
     public StringsMatcher(StringsMatcherConfig trieConfig) {
     }
 
-    public void parseText(final CharSequence text, final PayloadEmitHandler<T> emitHandler) {
+    public void parseText(final CharSequence text, final EmitHandler<T> emitHandler) {
+    }
+
+    /**
+     * Tokenizes a specified text and returns the emitted outputs.
+     * 
+     * @param text The character sequence to tokenize.
+     * @return A collection of emits.
+     */
+    public Collection<Emit<T>> parseText(final CharSequence text) {
+        return null;
+    }
+
+    /**
+     * Returns true if the text contains contains one of the search terms. Else,
+     * returns false.
+     * 
+     * @param Text Specified text.
+     * @return true if the text contains one of the search terms. Else, returns
+     *         false.
+     */
+    public boolean containsMatch(final CharSequence text) {
+        return false;
+    }
+
+    /**
+     * Tokenizes the specified text and returns the emitted outputs.
+     * 
+     * @param text The text to tokenize.
+     */
+    public Collection<Token<T>> tokenize(final String text) {
+        return null;
     }
 
     private void addKeyword(String keyword, T payload) {

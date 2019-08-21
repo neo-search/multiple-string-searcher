@@ -1,4 +1,6 @@
-package org.multiplestrings.trie;
+package org.multiplestrings;
+
+import org.multiplestrings.trie.Emit;
 
 /**
  * PayloadMatchToken holds a text ("the fragment") an emits some output.
@@ -10,9 +12,9 @@ package org.multiplestrings.trie;
  *
  * @param <T> The Type of the emitted payloads.
  */
-public class PayloadMatchToken<T> extends PayloadToken<T> {
+public class MatchToken<T> extends Token<T> {
 
-    private final PayloadEmit<T> emit;
+    private final Emit<T> emit;
 
     /**
      * Constructs a token with the specified text and the specified payload.
@@ -20,7 +22,7 @@ public class PayloadMatchToken<T> extends PayloadToken<T> {
      * @param fragment Text to use to construct this token.
      * @param emit     Payload to use to construct this token.
      */
-    public PayloadMatchToken(final String fragment, final PayloadEmit<T> emit) {
+    public MatchToken(final String fragment, final Emit<T> emit) {
         super(fragment);
         this.emit = emit;
     }
@@ -31,7 +33,7 @@ public class PayloadMatchToken<T> extends PayloadToken<T> {
     }
 
     @Override
-    public PayloadEmit<T> getEmit() {
+    public Emit<T> getEmit() {
         return this.emit;
     }
 }

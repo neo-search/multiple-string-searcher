@@ -1,4 +1,6 @@
-package org.multiplestrings.trie;
+package org.multiplestrings;
+
+import org.multiplestrings.trie.Emit;
 
 /***
  * PayloadToken holds a text ("the fragment") an emits some output. If
@@ -8,10 +10,10 @@ package org.multiplestrings.trie;
  *
  * @param <T> The Type of the emitted payloads.
  */
-public abstract class PayloadToken<T> {
+public abstract class Token<T> {
     private String fragment;
 
-    public PayloadToken(String fragment) {
+    public Token(String fragment) {
         this.fragment = fragment;
     }
 
@@ -24,5 +26,5 @@ public abstract class PayloadToken<T> {
      */
     public abstract boolean isMatch();
 
-    public abstract PayloadEmit<T> getEmit();
+    public abstract Emit<T> getEmit();
 }
