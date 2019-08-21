@@ -76,7 +76,7 @@ public class StringsMatcher<T> {
     public static class MultipleStringsMatcherBuilder<T> {
         private final StringsMatcherConfig config = new StringsMatcherConfig();
 
-        private final StringsMatcher<T> trie = new StringsMatcher<>(config);
+        private final StringsMatcher<T> stringMatcher = new StringsMatcher<>(config);
 
         private MultipleStringsMatcherBuilder() {
 
@@ -115,7 +115,7 @@ public class StringsMatcher<T> {
          * @throws NullPointerException if the keyword is null.
          */
         public MultipleStringsMatcherBuilder<T> addKeyword(final String keyword) {
-            this.trie.addKeyword(keyword);
+            this.stringMatcher.addKeyword(keyword);
             return this;
         }
 
@@ -127,7 +127,7 @@ public class StringsMatcher<T> {
          * @throws NullPointerException if the keyword is null.
          */
         public MultipleStringsMatcherBuilder<T> addKeyword(final String keyword, final T payload) {
-            this.trie.addKeyword(keyword, payload);
+            this.stringMatcher.addKeyword(keyword, payload);
             return this;
         }
 
@@ -140,7 +140,7 @@ public class StringsMatcher<T> {
          */
         public MultipleStringsMatcherBuilder<T> addKeywords(final Collection<Payload<T>> keywords) {
             for (Payload<T> payload : keywords) {
-                this.trie.addKeyword(payload.getKeyword(), payload.getData());
+                this.stringMatcher.addKeyword(payload.getKeyword(), payload.getData());
             }
             return this;
         }
@@ -183,8 +183,8 @@ public class StringsMatcher<T> {
          * @return The configured PayloadTrie.
          */
         public StringsMatcher<T> build() {
-            this.trie.compile();
-            return this.trie;
+            this.stringMatcher.compile();
+            return this.stringMatcher;
         }
 
         /**
@@ -193,8 +193,8 @@ public class StringsMatcher<T> {
          * @return The configured PayloadTrie.
          */
         public StringsMatcher<T> buildPayloadMatcher() {
-            this.trie.compile();
-            return this.trie;
+            this.stringMatcher.compile();
+            return this.stringMatcher;
         }
 
         /**
