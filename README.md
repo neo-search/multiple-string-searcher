@@ -1,7 +1,7 @@
 Aho-Corasick
 ============
 
-[![Build Status](https://travis-ci.org/robert-bor/aho-corasick.svg?branch=master)](https://travis-ci.org/robert-bor/aho-corasick)
+[![Build Status](https://travis-ci.org/neo-search/multiple-strings-matching.svg?branch=master)](https://travis-ci.org/neo-search/neo-search)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0f65bfb641f745a4b301b85d028a4a8d)](https://www.codacy.com/app/bor-robert/aho-corasick)
 [![Codecov](https://codecov.io/gh/robert-bor/aho-corasick/branch/master/graph/badge.svg)](https://codecov.io/gh/robert-bor/aho-corasick)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.ahocorasick/ahocorasick/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.ahocorasick/ahocorasick)
