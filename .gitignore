@@ -1,0 +1,6 @@
+.idea
+*.iml
+src/main/java/Main.java
+*.txt
+docs
+/target/
