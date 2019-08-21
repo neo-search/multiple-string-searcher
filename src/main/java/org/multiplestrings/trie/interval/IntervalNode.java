@@ -1,4 +1,4 @@
-package org.multiplestrings.tries.interval;
+package org.multiplestrings.trie.interval;
 
 import java.util.ArrayList;
 import java.util.Collections;

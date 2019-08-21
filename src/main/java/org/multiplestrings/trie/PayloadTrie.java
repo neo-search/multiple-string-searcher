@@ -11,10 +11,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.multiplestrings.trie.handler.DefaultPayloadEmitHandler;
 import org.multiplestrings.trie.handler.PayloadEmitHandler;
 import org.multiplestrings.trie.handler.StatefulPayloadEmitHandler;
-import org.multiplestrings.tries.interval.IntervalTree;
-import org.multiplestrings.tries.interval.Intervalable;
-import org.multiplestrings.tries.util.ListElementRemoval;
-import org.multiplestrings.tries.util.ListElementRemoval.RemoveElementPredicate;
+import org.multiplestrings.trie.interval.IntervalTree;
+import org.multiplestrings.trie.interval.Intervalable;
+import org.multiplestrings.trie.util.ListElementRemoval;
+import org.multiplestrings.trie.util.ListElementRemoval.RemoveElementPredicate;
 
 /**
  * A trie implementation, based on the Aho-Corasick white paper, Bell

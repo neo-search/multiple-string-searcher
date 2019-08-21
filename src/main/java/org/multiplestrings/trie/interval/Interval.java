@@ -1,4 +1,4 @@
-package org.multiplestrings.tries.interval;
+package org.multiplestrings.trie.interval;
 
 public class Interval implements Intervalable {
 

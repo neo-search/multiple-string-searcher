@@ -1,7 +1,7 @@
 package org.multiplestrings.trie;
 
-import org.multiplestrings.tries.interval.Interval;
-import org.multiplestrings.tries.interval.Intervalable;
+import org.multiplestrings.trie.interval.Interval;
+import org.multiplestrings.trie.interval.Intervalable;
 
 /**
  * PayloadEmit contains a matched term and its associated payload data.

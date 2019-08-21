@@ -1,4 +1,4 @@
-package org.multiplestrings.tries.util;
+package org.multiplestrings.trie.util;
 
 import java.util.ArrayList;
 import java.util.List;

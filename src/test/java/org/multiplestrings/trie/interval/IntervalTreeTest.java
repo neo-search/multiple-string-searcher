@@ -1,9 +1,9 @@
 package org.multiplestrings.trie.interval;
 
 import org.junit.Test;
-import org.multiplestrings.tries.interval.Interval;
-import org.multiplestrings.tries.interval.IntervalTree;
-import org.multiplestrings.tries.interval.Intervalable;
+import org.multiplestrings.trie.interval.Interval;
+import org.multiplestrings.trie.interval.IntervalTree;
+import org.multiplestrings.trie.interval.Intervalable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.multiplestrings.tries.util.ListElementRemoval;
-import org.multiplestrings.tries.util.ListElementRemoval.RemoveElementPredicate;
+import org.multiplestrings.trie.util.ListElementRemoval;
+import org.multiplestrings.trie.util.ListElementRemoval.RemoveElementPredicate;
 
 import junit.framework.Assert;
 

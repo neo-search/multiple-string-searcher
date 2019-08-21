@@ -1,7 +1,7 @@
 package org.multiplestrings.trie;
 
-import org.multiplestrings.tries.interval.Interval;
-import org.multiplestrings.tries.interval.Intervalable;
+import org.multiplestrings.trie.interval.Interval;
+import org.multiplestrings.trie.interval.Intervalable;
 
 public class Emit extends Interval implements Intervalable {
     private final String keyword;
