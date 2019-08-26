@@ -1,7 +1,7 @@
 package org.multiplestrings.trie;
 
 import org.junit.Test;
-import org.multiplestrings.trie.State;
+import org.neosearch.stringsearcher.trie.State;
 
 import static junit.framework.Assert.assertEquals;
 

@@ -1,4 +1,4 @@
-package org.multiplestrings.trie.interval;
+package org.neosearch.stringsearcher.trie.interval;
 
 public interface Intervalable extends Comparable {
 

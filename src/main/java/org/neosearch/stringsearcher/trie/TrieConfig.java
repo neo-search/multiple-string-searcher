@@ -1,4 +1,4 @@
-package org.multiplestrings.trie;
+package org.neosearch.stringsearcher.trie;
 
 public class TrieConfig {
 

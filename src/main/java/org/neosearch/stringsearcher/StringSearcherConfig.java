@@ -1,11 +1,11 @@
-package org.multiplestrings;
+package org.neosearch.stringsearcher;
 
 /**
  * Configures options for matching strings.
  * 
  * @author Daniel Beck
  */
-public class StringsMatcherConfig {
+public class StringSearcherConfig {
 
     private boolean caseInsensitive = false;
 

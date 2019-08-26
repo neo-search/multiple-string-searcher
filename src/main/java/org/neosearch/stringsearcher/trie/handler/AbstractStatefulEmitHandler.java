@@ -1,9 +1,9 @@
-package org.multiplestrings.trie.handler;
+package org.neosearch.stringsearcher.trie.handler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.multiplestrings.trie.Emit;
+import org.neosearch.stringsearcher.trie.Emit;
 
 public abstract class AbstractStatefulEmitHandler<T> implements StatefulEmitHandler<T> {
 

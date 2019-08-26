@@ -1,9 +1,9 @@
 package org.multiplestrings.trie.interval;
 
 import org.junit.Test;
-import org.multiplestrings.trie.interval.Interval;
-import org.multiplestrings.trie.interval.Intervalable;
-import org.multiplestrings.trie.interval.IntervalableComparatorBySize;
+import org.neosearch.stringsearcher.trie.interval.Interval;
+import org.neosearch.stringsearcher.trie.interval.Intervalable;
+import org.neosearch.stringsearcher.trie.interval.IntervalableComparatorBySize;
 
 import java.util.ArrayList;
 import java.util.Collections;

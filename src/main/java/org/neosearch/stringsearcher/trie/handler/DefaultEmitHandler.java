@@ -1,9 +1,9 @@
-package org.multiplestrings.trie.handler;
+package org.neosearch.stringsearcher.trie.handler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.multiplestrings.trie.Emit;
+import org.neosearch.stringsearcher.trie.Emit;
 
 public class DefaultEmitHandler<T> implements StatefulEmitHandler<T> {
 

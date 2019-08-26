@@ -1,7 +1,7 @@
 package org.multiplestrings.trie.interval;
 
 import org.junit.Test;
-import org.multiplestrings.trie.interval.Interval;
+import org.neosearch.stringsearcher.trie.interval.Interval;
 
 import java.util.Iterator;
 import java.util.Set;

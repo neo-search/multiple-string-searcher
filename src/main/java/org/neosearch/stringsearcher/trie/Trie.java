@@ -1,4 +1,4 @@
-package org.multiplestrings.trie;
+package org.neosearch.stringsearcher.trie;
 
 import static java.lang.Character.isWhitespace;
 
@@ -8,16 +8,19 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.multiplestrings.EmitHandler;
-import org.multiplestrings.FragmentToken;
-import org.multiplestrings.MatchToken;
-import org.multiplestrings.Token;
-import org.multiplestrings.trie.handler.DefaultEmitHandler;
-import org.multiplestrings.trie.handler.StatefulEmitHandler;
-import org.multiplestrings.trie.interval.IntervalTree;
-import org.multiplestrings.trie.interval.Intervalable;
-import org.multiplestrings.trie.util.ListElementRemoval;
-import org.multiplestrings.trie.util.ListElementRemoval.RemoveElementPredicate;
+import org.neosearch.stringsearcher.EmitHandler;
+import org.neosearch.stringsearcher.FragmentToken;
+import org.neosearch.stringsearcher.MatchToken;
+import org.neosearch.stringsearcher.StringSearcher;
+import org.neosearch.stringsearcher.StringSearcherPrepare;
+import org.neosearch.stringsearcher.StringSearcherConfig;
+import org.neosearch.stringsearcher.Token;
+import org.neosearch.stringsearcher.trie.handler.DefaultEmitHandler;
+import org.neosearch.stringsearcher.trie.handler.StatefulEmitHandler;
+import org.neosearch.stringsearcher.trie.interval.IntervalTree;
+import org.neosearch.stringsearcher.trie.interval.Intervalable;
+import org.neosearch.stringsearcher.trie.util.ListElementRemoval;
+import org.neosearch.stringsearcher.trie.util.ListElementRemoval.RemoveElementPredicate;
 
 /**
  * A trie implementation, based on the Aho-Corasick white paper, Bell
@@ -30,13 +33,13 @@ import org.multiplestrings.trie.util.ListElementRemoval.RemoveElementPredicate;
  * @author Daniel Beck
  * @param <T> The type of the supplied of the payload
  */
-public class Trie<T> {
+public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
 
-    private final TrieConfig trieConfig;
+    private final StringSearcherConfig trieConfig;
 
     private final State<T> rootState;
 
-    protected Trie(final TrieConfig trieConfig) {
+    public Trie(final StringSearcherConfig trieConfig) {
         this.trieConfig = trieConfig;
         this.rootState = new State<>();
     }
@@ -48,7 +51,7 @@ public class Trie<T> {
      * @param emit    the payload to emit for this search term.
      * @throws NullPointerException if the keyword is null.
      */
-    private void addKeyword(String keyword, T emit) {
+    public void addKeyword(String keyword, T emit) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -66,7 +69,7 @@ public class Trie<T> {
      * @param keyword The search term to add to the list of search terms.
      * @throws NullPointerException if the keyword is null.
      */
-    private void addKeyword(String keyword) {
+    public void addKeyword(String keyword) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -109,8 +112,7 @@ public class Trie<T> {
     }
 
     private Token<T> createFragment(final Emit<T> emit, final String text, final int lastCollectedPosition) {
-        return new FragmentToken<T>(
-                text.substring(lastCollectedPosition + 1, emit == null ? text.length() : emit.getStart()));
+        return new FragmentToken<T>(text.substring(lastCollectedPosition + 1, emit == null ? text.length() : emit.getStart()));
     }
 
     private Token<T> createMatch(Emit<T> emit, String text) {
@@ -263,8 +265,7 @@ public class Trie<T> {
         ListElementRemoval.removeIf(collectedEmits, predicate);
     }
 
-    private void removePartialMatchesWhiteSpaceSeparated(final CharSequence searchText,
-            final List<Emit<T>> collectedEmits) {
+    private void removePartialMatchesWhiteSpaceSeparated(final CharSequence searchText, final List<Emit<T>> collectedEmits) {
         final long size = searchText.length();
         final List<Emit<T>> removeEmits = new ArrayList<>();
 
@@ -292,7 +293,7 @@ public class Trie<T> {
         return newCurrentState;
     }
 
-    private void constructFailureStates() {
+    public Trie build() {
         final Queue<State<T>> queue = new LinkedBlockingDeque<>();
         final State<T> startState = getRootState();
 
@@ -320,6 +321,7 @@ public class Trie<T> {
                 targetState.addEmit(newFailureState.emit());
             }
         }
+        return this;
     }
 
     private boolean storeEmits(final int position, final State<T> currentState, final EmitHandler<T> emitHandler) {
@@ -349,150 +351,150 @@ public class Trie<T> {
         return this.rootState;
     }
 
-    /**
-     * Provides a fluent interface for constructing Trie instances with payloads.
-     *
-     * @return The builder used to configure its Trie.
-     */
-    public static <T> PayloadTrieBuilder<T> builder() {
-        return new PayloadTrieBuilder<T>();
-    }
+//    /**
+//     * Provides a fluent interface for constructing Trie instances with payloads.
+//     *
+//     * @return The builder used to configure its Trie.
+//     */
+//    public static <T> PayloadTrieBuilder<T> builder() {
+//        return new PayloadTrieBuilder<T>();
+//    }
 
-    /**
-     * Builder class to create a PayloadTrie instance.
-     * 
-     * @param <T> The type of the emitted payload.
-     */
-    public static class PayloadTrieBuilder<T> {
-
-        private final TrieConfig trieConfig = new TrieConfig();
-
-        private final Trie<T> trie = new Trie<>(trieConfig);
-
-        /**
-         * Default (empty) constructor.
-         */
-        private PayloadTrieBuilder() {
-        }
-
-        /**
-         * Configure the Trie to ignore case when searching for keywords in the text.
-         * This must be called before calling addKeyword because the algorithm converts
-         * keywords to lowercase as they are added, depending on this case sensitivity
-         * setting.
-         *
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> ignoreCase() {
-            this.trieConfig.setCaseInsensitive(true);
-            return this;
-        }
-
-        /**
-         * Configure the Trie to ignore overlapping keywords.
-         *
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> ignoreOverlaps() {
-            this.trieConfig.setAllowOverlaps(false);
-            return this;
-        }
-
-        /**
-         * Adds a keyword to the Trie's list of text search keywords. No Payload is
-         * supplied.
-         *
-         * @param keyword The keyword to add to the list.
-         * @return This builder.
-         * @throws NullPointerException if the keyword is null.
-         */
-        public PayloadTrieBuilder<T> addKeyword(final String keyword) {
-            this.trie.addKeyword(keyword);
-            return this;
-        }
-
-        /**
-         * Adds a keyword and a payload to the Trie's list of text search keywords.
-         *
-         * @param keyword The keyword to add to the list.
-         * @return This builder.
-         * @throws NullPointerException if the keyword is null.
-         */
-        public PayloadTrieBuilder<T> addKeyword(final String keyword, final T payload) {
-            this.trie.addKeyword(keyword, payload);
-            return this;
-        }
-
-        /**
-         * Adds a list of keywords and payloads to the Trie's list of text search
-         * keywords.
-         *
-         * @param keywords The keywords to add to the list.
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> addKeywords(final Collection<Payload<T>> keywords) {
-            for (Payload<T> payload : keywords) {
-                this.trie.addKeyword(payload.getKeyword(), payload.getData());
-            }
-            return this;
-        }
-
-        /**
-         * Configure the Trie to match whole keywords in the text.
-         *
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> onlyWholeWords() {
-            this.trieConfig.setOnlyWholeWords(true);
-            return this;
-        }
-
-        /**
-         * Configure the Trie to match whole keywords that are separated by whitespace
-         * in the text. For example, "this keyword thatkeyword" would only match the
-         * first occurrence of "keyword".
-         *
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> onlyWholeWordsWhiteSpaceSeparated() {
-            this.trieConfig.setOnlyWholeWordsWhiteSpaceSeparated(true);
-            return this;
-        }
-
-        /**
-         * Configure the Trie to stop after the first keyword is found in the text.
-         *
-         * @return This builder.
-         */
-        public PayloadTrieBuilder<T> stopOnHit() {
-            trie.trieConfig.setStopOnHit(true);
-            return this;
-        }
-
-        /**
-         * Configure the PayloadTrie based on the builder settings.
-         *
-         * @return The configured PayloadTrie.
-         */
-        public Trie<T> build() {
-            this.trie.constructFailureStates();
-            return this.trie;
-        }
-
-        /**
-         * @return This builder.
-         * @deprecated Use ignoreCase()
-         */
-        public PayloadTrieBuilder<T> caseInsensitive() {
-            return ignoreCase();
-        }
-
-        /**
-         * @return This builder.
-         * @deprecated Use ignoreOverlaps()
-         */
-        public PayloadTrieBuilder<T> removeOverlaps() {
-            return ignoreOverlaps();
-        }
-    }
+//    /**
+//     * Builder class to create a PayloadTrie instance.
+//     * 
+//     * @param <T> The type of the emitted payload.
+//     */
+//    public static class PayloadTrieBuilder<T> {
+//
+//        private final TrieConfig trieConfig = new TrieConfig();
+//
+//        private final Trie<T> trie = new Trie<>(trieConfig);
+//
+//        /**
+//         * Default (empty) constructor.
+//         */
+//        private PayloadTrieBuilder() {
+//        }
+//
+//        /**
+//         * Configure the Trie to ignore case when searching for keywords in the text.
+//         * This must be called before calling addKeyword because the algorithm converts
+//         * keywords to lowercase as they are added, depending on this case sensitivity
+//         * setting.
+//         *
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> ignoreCase() {
+//            this.trieConfig.setCaseInsensitive(true);
+//            return this;
+//        }
+//
+//        /**
+//         * Configure the Trie to ignore overlapping keywords.
+//         *
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> ignoreOverlaps() {
+//            this.trieConfig.setAllowOverlaps(false);
+//            return this;
+//        }
+//
+//        /**
+//         * Adds a keyword to the Trie's list of text search keywords. No Payload is
+//         * supplied.
+//         *
+//         * @param keyword The keyword to add to the list.
+//         * @return This builder.
+//         * @throws NullPointerException if the keyword is null.
+//         */
+//        public PayloadTrieBuilder<T> addKeyword(final String keyword) {
+//            this.trie.addKeyword(keyword);
+//            return this;
+//        }
+//
+//        /**
+//         * Adds a keyword and a payload to the Trie's list of text search keywords.
+//         *
+//         * @param keyword The keyword to add to the list.
+//         * @return This builder.
+//         * @throws NullPointerException if the keyword is null.
+//         */
+//        public PayloadTrieBuilder<T> addKeyword(final String keyword, final T payload) {
+//            this.trie.addKeyword(keyword, payload);
+//            return this;
+//        }
+//
+//        /**
+//         * Adds a list of keywords and payloads to the Trie's list of text search
+//         * keywords.
+//         *
+//         * @param keywords The keywords to add to the list.
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> addKeywords(final Collection<Payload<T>> keywords) {
+//            for (Payload<T> payload : keywords) {
+//                this.trie.addKeyword(payload.getKeyword(), payload.getData());
+//            }
+//            return this;
+//        }
+//
+//        /**
+//         * Configure the Trie to match whole keywords in the text.
+//         *
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> onlyWholeWords() {
+//            this.trieConfig.setOnlyWholeWords(true);
+//            return this;
+//        }
+//
+//        /**
+//         * Configure the Trie to match whole keywords that are separated by whitespace
+//         * in the text. For example, "this keyword thatkeyword" would only match the
+//         * first occurrence of "keyword".
+//         *
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> onlyWholeWordsWhiteSpaceSeparated() {
+//            this.trieConfig.setOnlyWholeWordsWhiteSpaceSeparated(true);
+//            return this;
+//        }
+//
+//        /**
+//         * Configure the Trie to stop after the first keyword is found in the text.
+//         *
+//         * @return This builder.
+//         */
+//        public PayloadTrieBuilder<T> stopOnHit() {
+//            trie.trieConfig.setStopOnHit(true);
+//            return this;
+//        }
+//
+//        /**
+//         * Configure the PayloadTrie based on the builder settings.
+//         *
+//         * @return The configured PayloadTrie.
+//         */
+//        public Trie<T> build() {
+//            this.trie.constructFailureStates();
+//            return this.trie;
+//        }
+//
+//        /**
+//         * @return This builder.
+//         * @deprecated Use ignoreCase()
+//         */
+//        public PayloadTrieBuilder<T> caseInsensitive() {
+//            return ignoreCase();
+//        }
+//
+//        /**
+//         * @return This builder.
+//         * @deprecated Use ignoreOverlaps()
+//         */
+//        public PayloadTrieBuilder<T> removeOverlaps() {
+//            return ignoreOverlaps();
+//        }
+//    }
 }

@@ -1,4 +1,4 @@
-package org.multiplestrings.trie.interval;
+package org.neosearch.stringsearcher.trie.interval;
 
 public class Interval implements Intervalable {
 

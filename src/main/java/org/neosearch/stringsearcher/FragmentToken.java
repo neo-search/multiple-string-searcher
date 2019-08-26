@@ -1,6 +1,6 @@
-package org.multiplestrings;
+package org.neosearch.stringsearcher;
 
-import org.multiplestrings.trie.Emit;
+import org.neosearch.stringsearcher.trie.Emit;
 
 /***
  * PayloadFragmentToken holds a text ("the fragment").

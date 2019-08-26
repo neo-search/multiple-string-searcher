@@ -1,4 +1,4 @@
-package org.multiplestrings.trie.util;
+package org.neosearch.stringsearcher.trie.util;
 
 import java.util.ArrayList;
 import java.util.List;

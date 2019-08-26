@@ -1,7 +1,7 @@
-package org.multiplestrings.trie;
+package org.neosearch.stringsearcher.trie;
 
-import org.multiplestrings.trie.interval.Interval;
-import org.multiplestrings.trie.interval.Intervalable;
+import org.neosearch.stringsearcher.trie.interval.Interval;
+import org.neosearch.stringsearcher.trie.interval.Intervalable;
 
 /**
  * PayloadEmit contains a matched term and its associated payload data.
