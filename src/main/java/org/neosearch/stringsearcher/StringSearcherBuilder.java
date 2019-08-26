@@ -1,11 +1,10 @@
 package org.neosearch.stringsearcher;
 
 import java.util.AbstractMap.SimpleEntry;
-
-import org.neosearch.stringsearcher.trie.Trie;
-
 import java.util.LinkedList;
 import java.util.Queue;
+
+import org.neosearch.stringsearcher.trie.Trie;
 
 /**
  * Builder class to create a StringMatcher instance. Several algorithms can be
