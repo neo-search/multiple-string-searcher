@@ -76,7 +76,7 @@ If you want the algorithm to only check for whole words, you can tell the Search
         .onlyWholeWords()
         .addKeyword("sugar")
         .build();
-    Collection<Emit> emits = stringSearcher.parseText("sugarcane sugarcane sugar canesugar");    
+    Collection<Emit> emits = searcher.parseText("sugarcane sugarcane sugar canesugar");    
 ```
 
 In this case, it will only find one match, whereas it would normally find four. The sugarcane/canesugar words
@@ -90,7 +90,7 @@ the Trie to lowercase the entire searchtext to ease the matching process. The lo
         .ignoreCase()
         .addKeyword("casing")
         .build();
-    Collection<Emit> emits = StringSearcher.parseText("CaSiNg");
+    Collection<Emit> emits = searcher.parseText("CaSiNg");
 ```
 
 Normally, this match would not be found. With the ignoreCase settings the entire search text is lowercased
@@ -180,7 +180,7 @@ recognizer. In this case use a PayloadTrie instead of a Trie:
         .addKeyword("she", new Word("f"))
         .addKeyword("he", new Word("m"))
         .build();
-    Collection<PayloadEmit<Word>> emits = StringSearcher.parseText("ushers");
+    Collection<PayloadEmit<Word>> emits = searcher.parseText("ushers");
 ```
 
 Releases
