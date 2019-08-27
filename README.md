@@ -29,7 +29,7 @@ A lot of work was spent into making the algorithm fast under most circumstances.
 
 Multiple-String-Search implements the following algorithms:
  - **Aho-Corasick**, the implementation is based on [robert-bot/aho-corasick].  The algorithm is explained in great detail in the white paper written by Aho and Corasick: http://cr.yp.to/bib/1975/aho.pdf 
- - **Aho-Corasick-Fast**, the implementation is based on [robert-bot/aho-corasick], however with many speed optimizations. Speed is improved in most cases by a factor of 2 or 3. The algorithm is however ot thread safe, only one thread at a time can add search words. 
+ - **Aho-Corasick-Fast**, the implementation is based on [robert-bot/aho-corasick], however with many speed optimizations. Speed is improved in most cases by a factor of 2 or 3. Notice: in contrast to upstream, this implementation is not thread-safe. Only one threat can be used to add new search-strings. 
  - **Compressed-Trie** an implementantion based on compressed tree / patricia trees
 
 Usage
@@ -92,7 +92,7 @@ If you want the algorithm to only check for whole words, you can tell the Search
 ```java
     StringSearcher trie = StringSearcher.builder()
         .onlyWholeWords()
-        .addKeyword("sugar")
+        .addSearchString("sugar")
         .build();
     Collection<Emit> emits = searcher.parseText("sugarcane sugarcane sugar canesugar");    
 ```
@@ -106,7 +106,7 @@ the Trie to lowercase the entire searchtext to ease the matching process. The lo
 ```java
     StringSearcher<?> stringSearcher = StringSearcher.builder()
         .ignoreCase()
-        .addKeyword("casing")
+        .addSearchString("casing")
         .build();
     Collection<Emit> emits = searcher.parseText("CaSiNg");
 ```
@@ -120,9 +120,9 @@ finds.
 
 ```java
     StringSearcher<?> stringSearcher = StringSearcher.builder().ignoreOverlaps()
-            .addKeyword("ab")
-            .addKeyword("cba")
-            .addKeyword("ababc")
+            .addSearchString("ab")
+            .addSearchString("cba")
+            .addSearchString("ababc")
             .build();
     Emit firstMatch = StringSearcher.firstMatch("ababcbab");
 ```
@@ -130,15 +130,28 @@ finds.
 The firstMatch will now be "ababc" found at position 0. containsMatch just checks if there is a firstMatch and
 returns true if that is the case.
 
+In the case above, the algorith with the fastest implementation is chosen. For the moment, this is **Aho-Corasick-fast**. Other algorithms can be chosen as follows:
+
+```java
+    StringSearcher<?> stringSearcher = StringSearcher.builder()
+    		.algorithm(Algorithm.AhoCorasick)
+            .addSearchString("ab")
+            .addSearchString("cba")
+            .addSearchString("ababc")
+            .build();
+    Emit firstMatch = StringSearcher.firstMatch("ababcbab");
+```
+
+
 If you just want the barebones Aho-Corasick algorithm (ie, no dealing with case insensitivity, overlaps and whole
  words) and you prefer to add your own handler to the mix, that is also possible.
  
 ```java
     StringSearcher<?> stringSearcher = StringSearcher.builder()
-            .addKeyword("hers")
-            .addKeyword("his")
-            .addKeyword("she")
-            .addKeyword("he")
+            .addSearchString("hers")
+            .addSearchString("his")
+            .addSearchString("she")
+            .addSearchString("he")
             .build();
 
     final List<Emit> emits = new ArrayList<>();
@@ -160,9 +173,9 @@ matches as soon as you encounter them. Let's look at an example where we want to
             "the Universe and Everything... Is... Forty-two,' said " +
             "Deep Thought, with infinite majesty and calm.";
     StringSearcher<?> stringSearcher = StringSearcher.builder().ignoreOverlaps().onlyWholeWords().ignoreCase()
-        .addKeyword("great question")
-        .addKeyword("forty-two")
-        .addKeyword("deep thought")
+        .addSearchString("great question")
+        .addSearchString("forty-two")
+        .addSearchString("deep thought")
         .build();
     Collection<Token> tokens = StringSearcher.tokenize(speech);
     StringBuffer html = new StringBuffer();
@@ -193,10 +206,10 @@ recognizer. In this case use a PayloadTrie instead of a Trie:
     }
     
     PayloadTrie<Word> trie = PayloadStringSearcher.<Word>builder()
-        .addKeyword("hers", new Word("f")
-        .addKeyword("his", new Word("m"))
-        .addKeyword("she", new Word("f"))
-        .addKeyword("he", new Word("m"))
+        .addSearchString("hers", new Word("f")
+        .addSearchString("his", new Word("m"))
+        .addSearchString("she", new Word("f"))
+        .addSearchString("he", new Word("m"))
         .build();
     Collection<PayloadEmit<Word>> emits = searcher.parseText("ushers");
 ```
