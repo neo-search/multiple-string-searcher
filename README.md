@@ -38,13 +38,13 @@ Usage
 Setting up the StringSearcher is easy: 
 
 ```java
-    StringSearcher<String> searcher = StringSearcher.builder()
+    StringSearcher<?> searcher = StringSearcher.builder()
         .addSearchString("hers")
         .addSearchString("his")
         .addSearchString("she")
         .addSearchString("he")
         .build();
-    Collection<Emit<String>> emits = searcher.parseText("ushers");
+    Collection<Emit<?>> emits = searcher.parseText("ushers");
 ```
 
 
@@ -54,6 +54,19 @@ You can now read the input text. In this case it will find the following:
 * "hers" starting at position 2, ending at position 5
 
 
+Notice the "?" in StringSearcher<?> ?. This makes it very easy to associate objects to matched words, 
+thus making it possible to implement a very easy named entity recognizer:
+
+```java
+    StringSearcher<Location> searcher = StringSearcher.builder()
+        .addSearchString("London", new Location("EN"))
+        .addSearchString("Paris", new Location("FR"))
+        .build();
+    Collection<Emit<Location>> emits = searcher.parseText("London and Paris");
+```
+Specifying "Location" as a generic parameter tells the searching algorithm to output the payloads passed with "addSearchString".
+
+  
 In normal situations you probably want to remove overlapping instances, retaining the longest and left-most
 matches.
 
