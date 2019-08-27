@@ -54,8 +54,8 @@ You can now read the input text. In this case it will find the following:
 * "hers" starting at position 2, ending at position 5
 
 
-Notice the "?" in StringSearcher<?> ?. This makes it very easy to associate objects to matched words, 
-thus making it possible to implement a very easy named entity recognizer:
+Notice the "?" in StringSearcher<?>. This makes it very easy to associate objects to matched words, 
+thus making it possible to very easily implement a simple an fast named entity recognizer:
 
 ```java
     StringSearcher<Location> searcher = StringSearcher.builder()
@@ -66,7 +66,10 @@ thus making it possible to implement a very easy named entity recognizer:
 ```
 Specifying "Location" as a generic parameter tells the searching algorithm to output the payloads passed with "addSearchString".
 
-  
+ 
+Searching options
+-----------------
+
 In normal situations you probably want to remove overlapping instances, retaining the longest and left-most
 matches.
 
