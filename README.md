@@ -1,3 +1,6 @@
+WORK IN PROGRESS. do NOT use.
+=============================
+
 Multiple-String-Searcher
 ========================
 
