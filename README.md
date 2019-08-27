@@ -21,17 +21,16 @@ even when used with dictionaries with several 100,000 entries.
 Multiple-String-Search
  - has a fluent API,
  - is easy to use,
- - it optimized for speed
- - implements several string search algorithms, that have different advantages for different situtations
- - allows to define payloads, that are returned for matched strings. This allows to realize a very simple and fast named entity recognition.
+ - is optimized for speed
+ - implements several string search algorithms that have different advantages for different situtations
+ - allows to define payloads for matched strings. This allows to realize a very simple and fast named entity recognition.
 
 A lot of work was spent into making the algorithm fast under most circumstances.
 
-multiple-string-search implements the following library:
- - an implementation of Aho-Corasick based on an implemententation from @robert-bot.  The algorithm is explained in great detail in the white paper written by Aho and Corasick: http://cr.yp.to/bib/1975/aho.pdf 
- - an implementation of Aho-Corasick based on an implemententation from @robert-bot, however not threat-safe and about 2-3 times faster. The user has to take care to not 
- add search strings from several libraries
- - an implementantion based on compressed tree / patricia trees
+Multiple-String-Search implements the following algorithms:
+ - **Aho-Corasick**, the implementation is based on [robert-bot/aho-corasick].  The algorithm is explained in great detail in the white paper written by Aho and Corasick: http://cr.yp.to/bib/1975/aho.pdf 
+ - **Aho-Corasick-Fast**, the implementation is based on [robert-bot/aho-corasick], however with many speed optimizations. Speed is improved in most cases by a factor of 2 or 3. The algorithm is however ot thread safe, only one thread at a time can add search words. 
+ - **Compressed-Trie** an implementantion based on compressed tree / patricia trees
 
 Usage
 -----
