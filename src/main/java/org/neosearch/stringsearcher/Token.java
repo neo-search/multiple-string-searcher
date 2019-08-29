@@ -8,7 +8,7 @@ import org.neosearch.stringsearcher.trie.Emit;
  * 
  * @author Daniel Beck
  *
- * @param <T> The Type of the emitted payloads.
+ * @param <T> The type of the emitted payloads.
  */
 public abstract class Token<T> {
     private String fragment;

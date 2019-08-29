@@ -30,7 +30,7 @@ A lot of work was spent into making the algorithm fast under most circumstances.
 Multiple-String-Search implements the following algorithms:
  - **Aho-Corasick**, the implementation is based on [robert-bot/aho-corasick].  The algorithm is explained in great detail in the white paper written by Aho and Corasick: http://cr.yp.to/bib/1975/aho.pdf 
  - **Aho-Corasick-Fast**, the implementation is based on [robert-bot/aho-corasick], however with many speed optimizations. Speed is improved in most cases by a factor of 2 or 3. Notice: in contrast to upstream, this implementation is not thread-safe. Only one threat can be used to add new search-strings. 
- - **Compressed-Trie** an implementantion based on compressed tree / patricia trees
+ - **Compressed-Trie** an implementation based on compressed tree / patricia trees
 
 Usage
 -----
@@ -134,7 +134,7 @@ In the case above, the algorith with the fastest implementation is chosen. For t
 
 ```java
     StringSearcher<?> stringSearcher = StringSearcher.builder()
-    		.algorithm(Algorithm.AhoCorasick)
+            .algorithm(Algorithm.AhoCorasick)
             .addSearchString("ab")
             .addSearchString("cba")
             .addSearchString("ababc")

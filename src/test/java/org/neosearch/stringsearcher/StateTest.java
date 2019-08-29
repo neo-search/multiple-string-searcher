@@ -1,4 +1,4 @@
-package org.multiplestrings.trie;
+package org.neosearch.stringsearcher;
 
 import org.junit.Test;
 import org.neosearch.stringsearcher.trie.State;
@@ -9,12 +9,9 @@ public class StateTest {
 
     @Test
     public void constructSequenceOfCharacters() {
-        State rootState = new State();
-        rootState
-                .addState('a')
-                .addState('b')
-                .addState('c');
-        State currentState = rootState.nextState('a');
+        State<String> rootState = new State<String>();
+        rootState.addState('a').addState('b').addState('c');
+        State<String> currentState = rootState.nextState('a');
         assertEquals(1, currentState.getDepth());
         currentState = currentState.nextState('b');
         assertEquals(2, currentState.getDepth());

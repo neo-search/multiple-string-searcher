@@ -41,10 +41,9 @@ public class StringSearcherBuilder<T> {
 
     /**
      * Configure the Trie to ignore case when searching for keywords in the text.
-     * This must be called befor public void parseText(final CharSequence text,
-     * final PayloadEmitHandler<T> emitHandler) { e calling addKeyword because the
-     * algorithm converts keywords to lowercase as they are added, depending on this
-     * case sensitivity setting.
+     * This must be called before calling addKeyword because the algorithm converts
+     * keywords to lowercase as they are added, depending on this case sensitivity
+     * setting.
      *
      * @return This builder.
      */
@@ -73,6 +72,13 @@ public class StringSearcherBuilder<T> {
      */
     public StringSearcherBuilder<T> addSearchString(final String keyword) {
         this.keyPayloads.add(new SimpleEntry<>(keyword, null));
+        return this;
+    }
+
+    public StringSearcherBuilder<T> addSearchStrings(final String... keywords) {
+        for (String string : keywords) {
+            this.keyPayloads.add(new SimpleEntry<>(string, null));
+        }
         return this;
     }
 
@@ -130,7 +136,7 @@ public class StringSearcherBuilder<T> {
             this.stringMatcher = new Trie<T>(this.config);
             SimpleEntry<String, T> simpleEntry = null;
             while ((simpleEntry = keyPayloads.poll()) != null)
-                stringMatcher.addKeyword(simpleEntry.getKey(), simpleEntry.getValue());
+                stringMatcher.addSearchString(simpleEntry.getKey(), simpleEntry.getValue());
 
             return this.stringMatcher.build();
         }

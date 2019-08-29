@@ -11,8 +11,6 @@ package org.neosearch.stringsearcher;
  * 
  * The <code>build()</code>-method creates a concret instance of the chosen
  * StringMatcher.
- * 
- * @param <T> The type of the emitted payload.
  */
 
 public class SimpleStringSearcherBuilder {
@@ -25,10 +23,9 @@ public class SimpleStringSearcherBuilder {
 
     /**
      * Configure the Trie to ignore case when searching for keywords in the text.
-     * This must be called befor public void parseText(final CharSequence text,
-     * final PayloadEmitHandler<T> emitHandler) { e calling addKeyword because the
-     * algorithm converts keywords to lowercase as they are added, depending on this
-     * case sensitivity setting.
+     * This must be called before calling addSearchString because the algorithm
+     * converts keywords to lowercase as they are added, depending on this case
+     * sensitivity setting.
      *
      * @return This builder.
      */
@@ -57,6 +54,18 @@ public class SimpleStringSearcherBuilder {
      */
     public SimpleStringSearcherBuilder addSearchString(final String keyword) {
         this.stringSearcherBuilder.addSearchString(keyword);
+        return this;
+    }
+
+    /**
+     * Adds keywords list of text search keywords. No Payload is supplied.
+     *
+     * @param keywords Keywords to add to the list.
+     * @return This builder.
+     * @throws NullPointerException if the keyword is null.
+     */
+    public SimpleStringSearcherBuilder addSearchStrings(final String... keywords) {
+        this.stringSearcherBuilder.addSearchStrings(keywords);
         return this;
     }
 

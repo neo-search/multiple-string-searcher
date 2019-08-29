@@ -5,7 +5,6 @@ import java.util.*;
 /**
  * <p>
  * A state has various important tasks it must attend to:
- * </p>
  * <p>
  * <ul>
  * <li>success; when a character points to another state, it must return that
@@ -17,12 +16,10 @@ import java.util.*;
  * on.</li>
  * </ul>
  * <p>
- * <p>
  * The root state is special in the sense that it has no failure state; it
  * cannot fail. If it 'fails' it will still parse the next character and start
  * from the root node. This ensures that the algorithm always runs. All other
  * states always have a fail state.
- * </p>
  *
  * @author Daniel Beck
  */
@@ -124,7 +121,7 @@ public class State<T> {
     /**
      * Adds a payload to be emitted for this state.
      * 
-     * @param emit Payload to be emitted.
+     * @param payload Payload to be emitted.
      */
     public void addEmit(Payload<T> payload) {
         if (this.emits == null) {

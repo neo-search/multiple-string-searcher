@@ -1,4 +1,4 @@
-package org.multiplestrings.trie.interval;
+package org.neosearch.stringsearcher.trie.interval;
 
 import org.junit.Test;
 import org.neosearch.stringsearcher.trie.interval.Interval;

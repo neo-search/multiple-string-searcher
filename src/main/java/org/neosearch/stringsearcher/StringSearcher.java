@@ -8,6 +8,8 @@ import org.neosearch.stringsearcher.trie.handler.StatefulEmitHandler;
 public interface StringSearcher<T> {
     public Collection<Token<T>> tokenize(final String text);
 
+    public Collection<Emit<T>> parseText(final CharSequence text);
+
     public Collection<Emit<T>> parseText(final CharSequence text, final StatefulEmitHandler<T> emitHandler);
 
     public boolean containsMatch(final CharSequence text);
