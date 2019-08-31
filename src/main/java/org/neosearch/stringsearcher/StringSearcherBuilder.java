@@ -1,6 +1,7 @@
 package org.neosearch.stringsearcher;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -76,6 +77,13 @@ public class StringSearcherBuilder<T> {
     }
 
     public StringSearcherBuilder<T> addSearchStrings(final String... keywords) {
+        for (String string : keywords) {
+            this.keyPayloads.add(new SimpleEntry<>(string, null));
+        }
+        return this;
+    }
+
+    public StringSearcherBuilder<T> addSearchStrings(final Collection<String> keywords) {
         for (String string : keywords) {
             this.keyPayloads.add(new SimpleEntry<>(string, null));
         }

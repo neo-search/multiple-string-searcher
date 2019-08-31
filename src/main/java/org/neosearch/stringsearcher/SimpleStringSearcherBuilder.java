@@ -1,5 +1,7 @@
 package org.neosearch.stringsearcher;
 
+import java.util.Collection;
+
 /**
  * Builder class to create a StringMatcher instance. Several algorithms can be
  * chosen from:
@@ -65,6 +67,18 @@ public class SimpleStringSearcherBuilder {
      * @throws NullPointerException if the keyword is null.
      */
     public SimpleStringSearcherBuilder addSearchStrings(final String... keywords) {
+        this.stringSearcherBuilder.addSearchStrings(keywords);
+        return this;
+    }
+
+    /**
+     * Adds keywords list of text search keywords. No Payload is supplied.
+     *
+     * @param keywords Keywords to add to the list.
+     * @return This builder.
+     * @throws NullPointerException if the keyword is null.
+     */
+    public SimpleStringSearcherBuilder addSearchStrings(final Collection<String> keywords) {
         this.stringSearcherBuilder.addSearchStrings(keywords);
         return this;
     }
