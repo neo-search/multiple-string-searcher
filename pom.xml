@@ -84,11 +84,6 @@
 			<artifactId>jmh-generator-annprocess</artifactId>
 			<version>${openjdk.jmh.version}</version>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>com.google.caliper</groupId> -->
-		<!-- <artifactId>caliper</artifactId> -->
-		<!-- <version>1.0-beta-2</version> -->
-		<!-- </dependency> -->
 	</dependencies>
 
 	<build>
@@ -157,30 +152,6 @@
 						<goals>
 							<goal>sign</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>run-benchmarks</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<classpathScope>test</classpathScope>
-							<executable>java</executable>
-							<arguments>
-								<argument>-classpath</argument>
-								<classpath />
-								<argument>org.openjdk.jmh.Main</argument>
-								<argument>.*</argument>
-							</arguments>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
