@@ -19,7 +19,7 @@ Include this dependency in your POM.
   <artifactId>multiple-string-searcher</artifactId>
   <version>0.0.1</version>
 </dependency>
-``
+```
 
 Introduction
 ------------
