@@ -1,4 +1,4 @@
-package org.neosearch.stringsearcher.trie;
+package org.neosearch.stringsearcher;
 
 import org.neosearch.stringsearcher.trie.interval.Interval;
 import org.neosearch.stringsearcher.trie.interval.Intervalable;

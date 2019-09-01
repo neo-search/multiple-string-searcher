@@ -2,7 +2,6 @@ package org.neosearch.stringsearcher;
 
 import java.util.Collection;
 
-import org.neosearch.stringsearcher.trie.Emit;
 import org.neosearch.stringsearcher.trie.handler.StatefulEmitHandler;
 
 public interface StringSearcher<T> {

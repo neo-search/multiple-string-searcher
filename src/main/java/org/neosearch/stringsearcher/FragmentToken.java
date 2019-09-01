@@ -1,7 +1,5 @@
 package org.neosearch.stringsearcher;
 
-import org.neosearch.stringsearcher.trie.Emit;
-
 /***
  * PayloadFragmentToken holds a text ("the fragment").
  * <p>

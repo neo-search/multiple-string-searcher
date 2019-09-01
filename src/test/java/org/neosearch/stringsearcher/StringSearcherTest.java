@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Test;
-import org.neosearch.stringsearcher.trie.Emit;
 import org.neosearch.stringsearcher.trie.handler.AbstractStatefulEmitHandler;
 import org.neosearch.stringsearcher.trie.handler.StatefulEmitHandler;
 

@@ -1,7 +1,5 @@
 package org.neosearch.stringsearcher;
 
-import org.neosearch.stringsearcher.trie.Emit;
-
 /***
  * PayloadToken holds a text ("the fragment") an emits some output. If
  * <code>isMatch</code> returns true, the token matched a search term.

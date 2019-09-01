@@ -5,11 +5,10 @@ import static java.lang.Character.isWhitespace;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
 
+import org.neosearch.stringsearcher.Emit;
 import org.neosearch.stringsearcher.EmitHandler;
 import org.neosearch.stringsearcher.FragmentToken;
 import org.neosearch.stringsearcher.MatchToken;

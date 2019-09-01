@@ -3,7 +3,7 @@ package org.neosearch.stringsearcher.trie.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.neosearch.stringsearcher.trie.Emit;
+import org.neosearch.stringsearcher.Emit;
 
 public class DefaultEmitHandler<T> implements StatefulEmitHandler<T> {
 
