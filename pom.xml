@@ -5,7 +5,7 @@
 
 	<groupId>org.neosearch.stringsearcher</groupId>
 	<artifactId>multiple-string-searcher</artifactId>
-	<version>0.2.0</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 	<name>Multiple-String-Searcher</name>
 	<description>Java library for efficient string matching against a large set of keywords</description>
@@ -38,7 +38,8 @@
 
 	<scm>
 		<url>scm:git://github.com/neosearch/multiple-string-searcher</url>
-		<connection>scm:git://github.com/neosearch/multiple-string-searcher</connection>
+		<connection>scm:git:git://github.com/neosearch/multiple-string-searcher.git</connection>
+		<developerConnection>scm:git:git@github.com/neosearch/multiple-string-searcher.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -74,16 +75,6 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-core</artifactId>
-			<version>${openjdk.jmh.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-generator-annprocess</artifactId>
-			<version>${openjdk.jmh.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -94,10 +85,20 @@
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>1.6.8</version>
-				<extensions>true</extensions>
+				<!-- <extensions>true</extensions> -->
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+<!-- 					<skipStaging>true</skipStaging> -->
 					<autoReleaseAfterClose>false</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
@@ -155,7 +156,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 

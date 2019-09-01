@@ -1,6 +1,3 @@
-WORK IN PROGRESS. do NOT use.
-=============================
-
 Multiple-String-Searcher
 ========================
 
@@ -11,6 +8,15 @@ Multiple-String-Searcher
 [![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.ahocorasick/ahocorasick/badge.svg)](http://www.javadoc.io/doc/org.ahocorasick/ahocorasick)
 [![Apache 2](http://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
+Dependancy
+----------
+
+Include this dependency in your POM. 
+<dependency>
+  <groupId>org.neosearch.stringsearcher</groupId>
+  <artifactId>multiple-string-searcher</artifactId>
+  <version>0.0.1</version>
+</dependency>
 
 Introduction
 ------------
