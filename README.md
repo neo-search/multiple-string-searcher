@@ -12,11 +12,14 @@ Dependancy
 ----------
 
 Include this dependency in your POM. 
+
+```xml
 <dependency>
   <groupId>org.neosearch.stringsearcher</groupId>
   <artifactId>multiple-string-searcher</artifactId>
   <version>0.0.1</version>
 </dependency>
+``
 
 Introduction
 ------------
