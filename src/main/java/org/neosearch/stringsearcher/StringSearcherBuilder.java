@@ -3,6 +3,7 @@ package org.neosearch.stringsearcher;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Queue;
 
 import org.neosearch.stringsearcher.trie.Trie;
@@ -29,7 +30,7 @@ public class StringSearcherBuilder<T> {
     private StringSearcherPrepare<T> stringMatcher;
 
     private Algorithm algorithm;
-    private Queue<SimpleEntry<String, T>> keyPayloads = new LinkedList<>();
+    private Queue<Entry<String, T>> keyPayloads = new LinkedList<>();
 
     public StringSearcherBuilder() {
         this.algorithm = Algorithm.AHO_COHARICK;
@@ -103,6 +104,18 @@ public class StringSearcherBuilder<T> {
     }
 
     /**
+     * Adds a keyword and a payload to the Trie's list of text search keywords.
+     *
+     * @param entry The keyword and its payload to add to the list.
+     * @return This builder.
+     * @throws NullPointerException if the keyword is null.
+     */
+    public StringSearcherBuilder<T> addSearchString(final Entry<String, T> entry) {
+        this.keyPayloads.add(entry);
+        return this;
+    }
+
+    /**
      * Configure the Trie to match whole keywords in the text.
      *
      * @return This builder.
@@ -142,7 +155,7 @@ public class StringSearcherBuilder<T> {
     public StringSearcher<T> build() {
         if (this.algorithm == Algorithm.AHO_COHARICK) {
             this.stringMatcher = new Trie<T>(this.config);
-            SimpleEntry<String, T> simpleEntry = null;
+            Entry<String, T> simpleEntry = null;
             while ((simpleEntry = keyPayloads.poll()) != null)
                 stringMatcher.addSearchString(simpleEntry.getKey(), simpleEntry.getValue());
 
