@@ -5,7 +5,7 @@
 
 	<groupId>org.neosearch.stringsearcher</groupId>
 	<artifactId>multiple-string-searcher</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 	<name>Multiple-String-Searcher</name>
 	<description>Java library for efficient string matching against a large set of keywords</description>
@@ -98,7 +98,7 @@
 				<configuration>
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-<!-- 					<skipStaging>true</skipStaging> -->
+					<skipStaging>true</skipStaging>
 					<autoReleaseAfterClose>false</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
