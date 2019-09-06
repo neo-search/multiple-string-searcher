@@ -41,7 +41,12 @@ public class StringSearcherBuilder<T> {
         this.algorithm = Algorithm.AHO_COHARICK;
     }
 
-    /** Sets the string searching implementation to be used. */
+    /**
+     * Sets the string searching implementation to be used.
+     * 
+     * @param algorithm Algorithm to use.
+     * @return This builder.
+     */
     public StringSearcherBuilder<T> algorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
         return this;
@@ -71,7 +76,7 @@ public class StringSearcherBuilder<T> {
     }
 
     /**
-     * Adds a keyword to the StringSearchers list of text search keywords. No
+     * Adds a search string to the StringSearchers list of text search keywords. No
      * payload is supplied.
      *
      * @param searchString The search string to add to the list.
@@ -83,6 +88,13 @@ public class StringSearcherBuilder<T> {
         return this;
     }
 
+    /**
+     * Adds an array of search strings without associated payloads to the
+     * StringSearcher.
+     * 
+     * @param searchStrings Search String to add to the StringSearcher.
+     * @return This builder.
+     */
     public StringSearcherBuilder<T> addSearchStrings(final String... searchStrings) {
         for (String string : searchStrings)
             addSearchStringImpl(string, null);
@@ -90,6 +102,13 @@ public class StringSearcherBuilder<T> {
         return this;
     }
 
+    /**
+     * Adds a collections of search strings without associated payloads to the
+     * StringSearcher.
+     * 
+     * @param searchStrings Search String to add to the StringSearcher.
+     * @return This builder.
+     */
     public StringSearcherBuilder<T> addSearchStrings(final Collection<String> searchStrings) {
         for (String string : searchStrings)
             addSearchStringImpl(string, null);
@@ -97,20 +116,21 @@ public class StringSearcherBuilder<T> {
         return this;
     }
 
-    private void addSearchStringImpl(final String searchString, T payload) {
-        this.stringsearchPayloads.add(new SimpleEntry<>(searchString, payload));
-    }
-
     /**
-     * Adds a keyword and a payload to the Trie's list of text search keywords.
+     * Adds a keyword and a payload to the StringSeacher' list of text search
+     * keywords.
      *
      * @param searchString The keyword to add to the list.
      * @return This builder.
      * @throws NullPointerException if the keyword is null.
      */
     public StringSearcherBuilder<T> addSearchString(final String searchString, final T payload) {
-        addSearchString(searchString, payload);
+        addSearchStringImpl(searchString, payload);
         return this;
+    }
+
+    private void addSearchStringImpl(final String searchString, T payload) {
+        this.stringsearchPayloads.add(new SimpleEntry<>(searchString, payload));
     }
 
     /**
