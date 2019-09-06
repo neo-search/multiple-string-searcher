@@ -109,7 +109,7 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
 
         for (final Emit<T> emit : collectedEmits) {
             if (emit.getStart() - lastCollectedPosition > 1) {
-                tokens.add((Token<T>) createFragment(emit, text, lastCollectedPosition));
+                tokens.add(createFragment(emit, text, lastCollectedPosition));
             }
 
             tokens.add(createMatch(emit, text));
@@ -117,7 +117,7 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
         }
 
         if (text.length() - lastCollectedPosition > 1) {
-            tokens.add((Token<T>) createFragment(null, text, lastCollectedPosition));
+            tokens.add(createFragment(null, text, lastCollectedPosition));
         }
 
         return tokens;

@@ -503,7 +503,7 @@ public class StringSearcherTest {
     private void checkEmit(Emit<Food> next, int expectedStart, int expectedEnd, String expectedKeyword, Food expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());
-        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getKeyword());
+        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getSearchString());
         assertEquals("Payload of emit shoud be " + expectedPayload, expectedPayload, next.getPayload());
     }
 
@@ -511,7 +511,7 @@ public class StringSearcherTest {
             Integer expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());
-        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getKeyword());
+        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getSearchString());
         assertEquals("Payload of emit shoud be " + expectedPayload, expectedPayload, next.getPayload());
     }
 
@@ -519,7 +519,7 @@ public class StringSearcherTest {
             String expectedPayload) {
         assertEquals("Start of emit should have been " + expectedStart, expectedStart, next.getStart());
         assertEquals("End of emit should have been " + expectedEnd, expectedEnd, next.getEnd());
-        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getKeyword());
+        assertEquals("Keyword of emit shoud be " + expectedKeyword, expectedKeyword, next.getSearchString());
         assertEquals("Payload of emit shoud be " + expectedPayload, expectedPayload, next.getPayload());
     }
 }
