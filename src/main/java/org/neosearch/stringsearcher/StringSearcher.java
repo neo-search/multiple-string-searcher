@@ -2,16 +2,19 @@ package org.neosearch.stringsearcher;
 
 import java.util.Collection;
 
-import org.neosearch.stringsearcher.trie.handler.StatefulEmitHandler;
-
 /**
- * The StringSearcher algorithm main interface, with builder methods to create a
- * concrete StringSearcher instance.
+ * A StringSearcher contain method to read in text and return the matched search
+ * strings. It is constructed with help of the builder methods
+ * <code>builer()</code> or <code>builderWithPayload()</code>.
  * 
- * StringSearcher contains methods to parse the text.
+ * <p>
+ * With <code>builderWithPayload()</code>, payloads can be associated to the
+ * searched strings. <code>builder()</code> allows to create a StringSearcher
+ * without payloads.
  * 
- * Every StringSearcher Algorithm must implement StringSearcher and
- * StringSearcherPrepare.
+ * <p>
+ * Every concrete StringSearcher implementention must implement StringSearcher
+ * and StringSearcherPrepare.
  * <p>
  *
  * The payload trie adds the possibility to specify emitted payloads for each
@@ -49,15 +52,6 @@ public interface StringSearcher<T> {
      *         false.
      */
     public boolean containsMatch(final CharSequence text);
-
-//    /**
-//     * Parses the specified text with this stringsearcher with the specified
-//     * EmitHandler.
-//     * 
-//     * @param text        The text to tokenize.
-//     * @param emitHandler EmitHandler to call for each matching string.
-//     */
-//    public Collection<Emit<T>> parseText(final CharSequence text, final StatefulEmitHandler<T> emitHandler);
 
     /**
      * Parses the specified text with this stringsearcher with the specified

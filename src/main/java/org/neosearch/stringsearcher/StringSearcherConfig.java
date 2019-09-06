@@ -24,14 +24,26 @@ public class StringSearcherConfig {
         return caseInsensitive;
     }
 
+    /**
+     * Configures if the StringSearcher should respect case sensitivity or not.
+     * 
+     * @param caseInsensitive Case sensitivty
+     */
     public void setCaseInsensitive(boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
     }
 
+    /**
+     * @return true if the algorithm should stop on hit.
+     */
     public boolean isStopOnHit() {
         return stopOnHit;
     }
 
+    /**
+     * Configures it he StringSearcher should stop on hit.
+     * @param stopOnHit true, if the StringSearch should stop on hit. False 
+     */
     public void setStopOnHit(boolean stopOnHit) {
         this.stopOnHit = stopOnHit;
     }

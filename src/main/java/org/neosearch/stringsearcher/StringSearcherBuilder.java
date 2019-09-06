@@ -9,12 +9,11 @@ import java.util.Queue;
 import org.neosearch.stringsearcher.trie.Trie;
 
 /**
- * Builder class to create a StringMatcher instance. Several algorithms can be
- * chosen from:
+ * Builder class to create a StringMatcher instance. The builder is can provide
+ * a stringsearcher implementation for serval algorithm. For the moment, only
+ * "naive aho coharick" is available.
  * <ul>
  * <li>AHO_COHARICK
- * <li>AHO_COHARICK_IMPROVED
- * <li>COMPRESSED_TRIE
  * </ul>
  * 
  * The <code>build()</code>-method creates a concret instance of the chosen
@@ -29,23 +28,30 @@ public class StringSearcherBuilder<T> {
 
     private StringSearcherPrepare<T> stringMatcher;
 
-    private Algorithm algorithm;
-    private Queue<Entry<String, T>> keyPayloads = new LinkedList<>();
+    private Queue<Entry<String, T>> stringsearchPayloads = new LinkedList<>();
 
+    private Algorithm algorithm;
+
+    /**
+     * Creates a string searcher builder. It defaults to the AHO_COHARICK string
+     * matching algorithm. The defaut algorithm can be overriden with
+     * <code>algorithm()</code>.
+     */
     public StringSearcherBuilder() {
         this.algorithm = Algorithm.AHO_COHARICK;
     }
 
+    /** Sets the string searching implementation to be used. */
     public StringSearcherBuilder<T> algorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
         return this;
     }
 
     /**
-     * Configure the Trie to ignore case when searching for keywords in the text.
-     * This must be called before calling addKeyword because the algorithm converts
-     * keywords to lowercase as they are added, depending on this case sensitivity
-     * setting.
+     * Configure the StringSearcher to ignore case when searching for keywords in
+     * the text. This must be called before calling addSearchString because the
+     * algorithm converts keywords to lowercase as they are added, depending on this
+     * case sensitivity setting.
      *
      * @return This builder.
      */
@@ -65,41 +71,45 @@ public class StringSearcherBuilder<T> {
     }
 
     /**
-     * Adds a keyword to the Trie's list of text search keywords. No Payload is
-     * supplied.
+     * Adds a keyword to the StringSearchers list of text search keywords. No
+     * payload is supplied.
      *
-     * @param keyword The keyword to add to the list.
+     * @param searchString The search string to add to the list.
      * @return This builder.
      * @throws NullPointerException if the keyword is null.
      */
-    public StringSearcherBuilder<T> addSearchString(final String keyword) {
-        this.keyPayloads.add(new SimpleEntry<>(keyword, null));
+    public StringSearcherBuilder<T> addSearchString(final String searchString) {
+        addSearchStringImpl(searchString, null);
         return this;
     }
 
-    public StringSearcherBuilder<T> addSearchStrings(final String... keywords) {
-        for (String string : keywords) {
-            this.keyPayloads.add(new SimpleEntry<>(string, null));
-        }
+    public StringSearcherBuilder<T> addSearchStrings(final String... searchStrings) {
+        for (String string : searchStrings)
+            addSearchStringImpl(string, null);
+
         return this;
     }
 
-    public StringSearcherBuilder<T> addSearchStrings(final Collection<String> keywords) {
-        for (String string : keywords) {
-            this.keyPayloads.add(new SimpleEntry<>(string, null));
-        }
+    public StringSearcherBuilder<T> addSearchStrings(final Collection<String> searchStrings) {
+        for (String string : searchStrings)
+            addSearchStringImpl(string, null);
+
         return this;
+    }
+
+    private void addSearchStringImpl(final String searchString, T payload) {
+        this.stringsearchPayloads.add(new SimpleEntry<>(searchString, payload));
     }
 
     /**
      * Adds a keyword and a payload to the Trie's list of text search keywords.
      *
-     * @param keyword The keyword to add to the list.
+     * @param searchString The keyword to add to the list.
      * @return This builder.
      * @throws NullPointerException if the keyword is null.
      */
-    public StringSearcherBuilder<T> addSearchString(final String keyword, final T payload) {
-        this.keyPayloads.add(new SimpleEntry<>(keyword, payload));
+    public StringSearcherBuilder<T> addSearchString(final String searchString, final T payload) {
+        addSearchString(searchString, payload);
         return this;
     }
 
@@ -111,12 +121,12 @@ public class StringSearcherBuilder<T> {
      * @throws NullPointerException if the keyword is null.
      */
     public StringSearcherBuilder<T> addSearchString(final Entry<String, T> entry) {
-        this.keyPayloads.add(entry);
+        this.stringsearchPayloads.add(entry);
         return this;
     }
 
     /**
-     * Configure the Trie to match whole keywords in the text.
+     * Configure the StringSearcher to match whole keywords in the text.
      *
      * @return This builder.
      */
@@ -148,15 +158,15 @@ public class StringSearcherBuilder<T> {
     }
 
     /**
-     * Configure the PayloadTrie based on the builder settings.
+     * Constructs a StringSearcher based on the builder settings.
      *
-     * @return The configured PayloadTrie.
+     * @return The configured StringSearcher.
      */
     public StringSearcher<T> build() {
         if (this.algorithm == Algorithm.AHO_COHARICK) {
             this.stringMatcher = new Trie<T>(this.config);
             Entry<String, T> simpleEntry = null;
-            while ((simpleEntry = keyPayloads.poll()) != null)
+            while ((simpleEntry = stringsearchPayloads.poll()) != null)
                 stringMatcher.addSearchString(simpleEntry.getKey(), simpleEntry.getValue());
 
             return this.stringMatcher.build();
