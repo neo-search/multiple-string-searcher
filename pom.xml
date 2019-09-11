@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.neosearch.stringsearcher</groupId>
+	<groupId>org.neosearch</groupId>
 	<artifactId>multiple-string-searcher</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 	<name>Multiple-String-Searcher</name>
 	<description>Java library for efficient string matching against a large set of keywords</description>
 	<inceptionYear>2019</inceptionYear>
-	<url>https://neosearch.de</url>
+	<url>https://neosearch.org</url>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -25,7 +25,7 @@
 
 	<organization>
 		<name>neoSearch UG (haftungsbeschränkt)</name>
-		<url>https://neosearch.de</url>
+		<url>https://neosearch.org</url>
 	</organization>
 
 	<licenses>
