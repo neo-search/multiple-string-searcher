@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.neosearch</groupId>
+	<groupId>org.neosearch.stringsearcher</groupId>
 	<artifactId>multiple-string-searcher</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<packaging>jar</packaging>
 	<name>Multiple-String-Searcher</name>
 	<description>Java library for efficient string matching against a large set of keywords</description>
@@ -85,7 +85,7 @@
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>1.6.8</version>
-				<!-- <extensions>true</extensions> -->
+				<extensions>true</extensions>
 				<executions>
 					<execution>
 						<id>default-deploy</id>
@@ -99,7 +99,7 @@
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<skipStaging>true</skipStaging>
-					<autoReleaseAfterClose>false</autoReleaseAfterClose>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
 
