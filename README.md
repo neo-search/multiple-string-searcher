@@ -2,6 +2,8 @@ Multiple-String-Searcher
 ========================
 
 [![Build Status](https://travis-ci.org/neo-search/multiple-string-searcher.svg?branch=master)](https://travis-ci.org/neo-search/neo-search)
+[![Maven Central](https://img.shields.io/maven-central/v/org.neosearch.stringsearcher/multiple-string-searcher.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.neosearch.stringsearcher%22%20AND%20a:%22multiple-string-searcher%22)
+[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.neosearch.stringsearcher/multiple-string-searcher/badge.svg)](https://www.javadoc.io/doc/org.neosearch.stringsearcher/multiple-string-searcher/)
 [![Apache 2](http://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Dependancy
