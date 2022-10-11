@@ -42,7 +42,6 @@ public class StringSearcherConfig {
 
     /**
      * Configures it he StringSearcher should stop on hit.
-     * 
      * @param stopOnHit true, if the StringSearch should stop on hit. False
      */
     public void setStopOnHit(boolean stopOnHit) {
