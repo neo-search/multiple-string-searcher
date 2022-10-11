@@ -1,5 +1,7 @@
 package org.neosearch.stringsearcher;
 
+import java.util.function.Predicate;
+
 /**
  * Configures options for matching strings.
  * 
@@ -11,11 +13,9 @@ public class StringSearcherConfig {
 
     private boolean allowOverlaps = true;
 
-    private boolean onlyWholeWords = false;
-
-    private boolean onlyWholeWordsWhiteSpaceSeparated = false;
-
     private boolean stopOnHit = false;
+
+    private Predicate<Character> isInWordCharacter = null;
 
     /**
      * Returns true if the matching should be case insensitive.
@@ -42,7 +42,8 @@ public class StringSearcherConfig {
 
     /**
      * Configures it he StringSearcher should stop on hit.
-     * @param stopOnHit true, if the StringSearch should stop on hit. False 
+     * 
+     * @param stopOnHit true, if the StringSearch should stop on hit. False
      */
     public void setStopOnHit(boolean stopOnHit) {
         this.stopOnHit = stopOnHit;
@@ -56,20 +57,24 @@ public class StringSearcherConfig {
         this.allowOverlaps = allowOverlaps;
     }
 
-    public boolean isOnlyWholeWords() {
-        return onlyWholeWords;
-    }
-
     public void setOnlyWholeWords(boolean onlyWholeWords) {
-        this.onlyWholeWords = onlyWholeWords;
-    }
-
-    public boolean isOnlyWholeWordsWhiteSpaceSeparated() {
-        return onlyWholeWordsWhiteSpaceSeparated;
+        this.isInWordCharacter = onlyWholeWords ? ch -> Character.isAlphabetic(ch) : null;
     }
 
     public void setOnlyWholeWordsWhiteSpaceSeparated(boolean onlyWholeWordsWhiteSpaceSeparated) {
-        this.onlyWholeWordsWhiteSpaceSeparated = onlyWholeWordsWhiteSpaceSeparated;
+        this.isInWordCharacter = onlyWholeWordsWhiteSpaceSeparated ? ch -> !Character.isWhitespace(ch) : null;
+    }
+
+    public void setIsInWordCharacter(Predicate<Character> isInWordCharacter) {
+        this.isInWordCharacter = isInWordCharacter;
+    }
+
+    public Predicate<Character> isInWordCharacter() {
+        return this.isInWordCharacter;
+    }
+
+    public boolean isOnlyWholeWords() {
+        return isInWordCharacter != null;
     }
 
 }
