@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Queue;
-
+import java.util.function.Predicate;
 import org.neosearch.stringsearcher.trie.Trie;
 
 /**
@@ -164,6 +164,17 @@ public class StringSearcherBuilder<T> {
      */
     public StringSearcherBuilder<T> onlyWholeWordsWhiteSpaceSeparated() {
         this.config.setOnlyWholeWordsWhiteSpaceSeparated(true);
+        return this;
+    }
+
+    /**
+     * Configure the Trie to match whole keywords based on the given predicate which
+     * returns true for all characters that are considered in-word characters.
+     *
+     * @return This builder.
+     */
+    public StringSearcherBuilder<T> setInWordCharacters(Predicate<Character> isInWordCharacter) {
+        this.config.setIsInWordCharacter(isInWordCharacter);
         return this;
     }
 

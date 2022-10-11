@@ -1,13 +1,10 @@
 package org.neosearch.stringsearcher.trie;
 
-import static java.lang.Character.isWhitespace;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
-
 import org.neosearch.stringsearcher.Emit;
 import org.neosearch.stringsearcher.EmitHandler;
 import org.neosearch.stringsearcher.FragmentToken;
@@ -155,14 +152,9 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
 
         final List<Emit<T>> collectedEmits = emitHandler.getEmits();
 
-        if (trieConfig.isOnlyWholeWords()) {
+        if (trieConfig.isInWordCharacter() != null) {
             removePartialMatches(text, collectedEmits);
         }
-
-        if (trieConfig.isOnlyWholeWordsWhiteSpaceSeparated()) {
-            removePartialMatchesWhiteSpaceSeparated(text, collectedEmits);
-        }
-
         if (!trieConfig.isAllowOverlaps()) {
             IntervalTree intervalTree = new IntervalTree((List<Intervalable>) (List<?>) collectedEmits);
             intervalTree.removeOverlaps((List<Intervalable>) (List<?>) collectedEmits);
@@ -258,8 +250,8 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
     }
 
     private boolean isPartialMatch(final CharSequence searchText, final Emit<T> emit) {
-        return (emit.getStart() != 0 && Character.isAlphabetic(searchText.charAt(emit.getStart() - 1)))
-                || (emit.getEnd() + 1 != searchText.length() && Character.isAlphabetic(searchText.charAt(emit.getEnd() + 1)));
+        return (emit.getStart() != 0 && trieConfig.isInWordCharacter().test(searchText.charAt(emit.getStart() - 1)))
+                || (emit.getEnd() + 1 != searchText.length() && trieConfig.isInWordCharacter().test(searchText.charAt(emit.getEnd() + 1)));
     }
 
     private void removePartialMatches(final CharSequence searchText, final List<Emit<T>> collectedEmits) {
@@ -274,23 +266,6 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
         };
 
         ListElementRemoval.removeIf(collectedEmits, predicate);
-    }
-
-    private void removePartialMatchesWhiteSpaceSeparated(final CharSequence searchText, final List<Emit<T>> collectedEmits) {
-        final long size = searchText.length();
-        final List<Emit<T>> removeEmits = new ArrayList<>();
-
-        for (final Emit<T> emit : collectedEmits) {
-            if ((emit.getStart() == 0 || isWhitespace(searchText.charAt(emit.getStart() - 1)))
-                    && (emit.getEnd() + 1 == size || isWhitespace(searchText.charAt(emit.getEnd() + 1)))) {
-                continue;
-            }
-            removeEmits.add(emit);
-        }
-
-        for (final Emit<T> removeEmit : removeEmits) {
-            collectedEmits.remove(removeEmit);
-        }
     }
 
     private State<T> getState(State<T> currentState, final Character character) {
