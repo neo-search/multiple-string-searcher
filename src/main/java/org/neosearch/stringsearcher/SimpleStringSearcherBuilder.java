@@ -1,6 +1,7 @@
 package org.neosearch.stringsearcher;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  * Builder class to create a StringMatcher instance. Several algorithms can be
@@ -112,6 +113,18 @@ public class SimpleStringSearcherBuilder {
      */
     public SimpleStringSearcherBuilder stopOnHit() {
         this.stringSearcherBuilder.stopOnHit();
+        return this;
+    }
+
+    /**
+     * Configure the Trie to match keywords based on the given predicate which
+     * returns true for all characters that are considered in-word characters.
+     *
+     * @return This builder.
+     */
+    public SimpleStringSearcherBuilder setIsInWordCharacter(
+            Predicate<Character> isInWordCharacter) {
+        this.stringSearcherBuilder.setInWordCharacters(isInWordCharacter);
         return this;
     }
 

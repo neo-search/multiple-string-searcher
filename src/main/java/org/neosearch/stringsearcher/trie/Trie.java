@@ -21,11 +21,12 @@ import org.neosearch.stringsearcher.trie.util.ListElementRemoval;
 import org.neosearch.stringsearcher.trie.util.ListElementRemoval.RemoveElementPredicate;
 
 /**
- * A trie implementation, based on the Aho-Corasick white paper, Bell technologies:
- * http://cr.yp.to/bib/1975/aho.pdf
+ * A trie implementation, based on the Aho-Corasick white paper, Bell
+ * technologies: http://cr.yp.to/bib/1975/aho.pdf
  * <p>
  *
- * The payload trie adds the possibility to specify emitted payloads for each added keyword.
+ * The payload trie adds the possibility to specify emitted payloads for each
+ * added keyword.
  * 
  * @author Daniel Beck
  * @param <T> The type of the supplied of the payload
@@ -119,9 +120,10 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
         return tokens;
     }
 
-    private Token<T> createFragment(final Emit<T> emit, final String text, final int lastCollectedPosition) {
-        return new FragmentToken<T>(
-                text.substring(lastCollectedPosition + 1, emit == null ? text.length() : emit.getStart()));
+    private Token<T> createFragment(final Emit<T> emit, final String text,
+            final int lastCollectedPosition) {
+        return new FragmentToken<T>(text.substring(lastCollectedPosition + 1,
+                emit == null ? text.length() : emit.getStart()));
     }
 
     private Token<T> createMatch(Emit<T> emit, String text) {
@@ -139,14 +141,16 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
     }
 
     /**
-     * Tokenizes the specified text by using a custom EmitHandler and returns the emitted outputs.
+     * Tokenizes the specified text by using a custom EmitHandler and returns the
+     * emitted outputs.
      * 
      * @param text The character sequence to tokenize.
      * @param emitHandler The emit handler that will be used to parse the text.
      * @return A collection of emits.
      */
     @SuppressWarnings("unchecked")
-    public Collection<Emit<T>> parseText(final CharSequence text, final StatefulEmitHandler<T> emitHandler) {
+    public Collection<Emit<T>> parseText(final CharSequence text,
+            final StatefulEmitHandler<T> emitHandler) {
         parseText(text, (EmitHandler<T>) emitHandler);
 
         final List<Emit<T>> collectedEmits = emitHandler.getEmits();
@@ -155,7 +159,8 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
             removePartialMatches(text, collectedEmits);
         }
         if (!trieConfig.isAllowOverlaps()) {
-            IntervalTree intervalTree = new IntervalTree((List<Intervalable>) (List<?>) collectedEmits);
+            IntervalTree intervalTree =
+                    new IntervalTree((List<Intervalable>) (List<?>) collectedEmits);
             intervalTree.removeOverlaps((List<Intervalable>) (List<?>) collectedEmits);
         }
 
@@ -163,17 +168,20 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
     }
 
     /**
-     * Returns true if the text contains contains one of the search terms. Else, returns false.
+     * Returns true if the text contains contains one of the search terms. Else,
+     * returns false.
      * 
      * @param text Specified text.
-     * @return true if the text contains one of the search terms. Else, returns false.
+     * @return true if the text contains one of the search terms. Else, returns
+     *         false.
      */
     public boolean containsMatch(final CharSequence text) {
         return firstMatch(text) != null;
     }
 
     /**
-     * Tokenizes the specified text by using a custom EmitHandler and returns the emitted outputs.
+     * Tokenizes the specified text by using a custom EmitHandler and returns the
+     * emitted outputs.
      * 
      * @param text The character sequence to tokenize.
      * @param emitHandler The emit handler that will be used to parse the text.
@@ -228,8 +236,9 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
 
                 if (payloads != null && !payloads.isEmpty()) {
                     for (final Payload<T> payload : payloads) {
-                        final Emit<T> emit = new Emit<>(position - payload.getKeyword().length() + 1, position,
-                                payload.getKeyword(), payload.getData());
+                        final Emit<T> emit =
+                                new Emit<>(position - payload.getKeyword().length() + 1, position,
+                                        payload.getKeyword(), payload.getData());
                         if (trieConfig.isOnlyWholeWords()) {
                             if (!isPartialMatch(text, emit)) {
                                 return emit;
@@ -246,12 +255,14 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
     }
 
     private boolean isPartialMatch(final CharSequence searchText, final Emit<T> emit) {
-        return (emit.getStart() != 0 && trieConfig.isInWordCharacter().test(searchText.charAt(emit.getStart() - 1)))
-                || (emit.getEnd() + 1 != searchText.length()
-                        && trieConfig.isInWordCharacter().test(searchText.charAt(emit.getEnd() + 1)));
+        return (emit.getStart() != 0
+                && trieConfig.isInWordCharacter().test(searchText.charAt(emit.getStart() - 1)))
+                || (emit.getEnd() + 1 != searchText.length() && trieConfig.isInWordCharacter()
+                        .test(searchText.charAt(emit.getEnd() + 1)));
     }
 
-    private void removePartialMatches(final CharSequence searchText, final List<Emit<T>> collectedEmits) {
+    private void removePartialMatches(final CharSequence searchText,
+            final List<Emit<T>> collectedEmits) {
 
         final RemoveElementPredicate<Emit<T>> predicate = new RemoveElementPredicate<Emit<T>>() {
 
@@ -307,15 +318,19 @@ public class Trie<T> implements StringSearcher<T>, StringSearcherPrepare<T> {
         return this;
     }
 
-    private boolean storeEmits(final int position, final State<T> currentState, final EmitHandler<T> emitHandler) {
+    private boolean storeEmits(final int position, final State<T> currentState,
+            final EmitHandler<T> emitHandler) {
         boolean emitted = false;
         final Collection<Payload<T>> payloads = currentState.emit();
 
         // TODO: The check for empty might be superfluous.
         if (payloads != null && !payloads.isEmpty()) {
             for (final Payload<T> payload : payloads) {
-                emitted = emitHandler.emit(new Emit<T>(position - payload.getKeyword().length() + 1, position,
-                        payload.getKeyword(), payload.getData())) || emitted;
+                emitted =
+                        emitHandler
+                                .emit(new Emit<T>(position - payload.getKeyword().length() + 1,
+                                        position, payload.getKeyword(), payload.getData()))
+                                || emitted;
 
                 if (emitted && trieConfig.isStopOnHit()) {
                     break;

@@ -62,7 +62,8 @@ public class StringSearcherConfig {
     }
 
     public void setOnlyWholeWordsWhiteSpaceSeparated(boolean onlyWholeWordsWhiteSpaceSeparated) {
-        this.isInWordCharacter = onlyWholeWordsWhiteSpaceSeparated ? ch -> !Character.isWhitespace(ch) : null;
+        this.isInWordCharacter =
+                onlyWholeWordsWhiteSpaceSeparated ? ch -> !Character.isWhitespace(ch) : null;
     }
 
     public void setIsInWordCharacter(Predicate<Character> isInWordCharacter) {
